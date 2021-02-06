@@ -1,3 +1,6 @@
+import time
+import datetime
+import sys
 import requests
 from bs4 import BeautifulSoup
 import smtplib
@@ -38,12 +41,10 @@ def main(event, context):
         msg = create_message(my_addr, my_addr, "ドル円レートお知らせ", price)
         send_mail(msg)
 
-# import time
-# import datetime
-# import sys
-# # import classes
+
+# import classes
 # from browser_controll import BrowserControll
-# # selenium chrome driverの最新verをインストール
+# selenium chrome driverの最新verをインストール
 # from selenium import webdriver
 # from webdriver_manager.chrome import ChromeDriverManager
 # from selenium.webdriver.common.by import By
