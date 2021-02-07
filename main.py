@@ -32,11 +32,12 @@ def get_item_quantity():
     bool = False
     としてitem_nameを返す
     """
-    item_name = soup.find(class_='item_name').text
-    if int(item_value) >= 1:
-        return {"bool": True, "item_name": item_name}
+    item_name_html = soup.find(class_='item_name')
+
+    if int(item_value) >= 1 and item_name_html != None:
+        return {"bool": True, "item_name": item_name_html.text}
     else:
-        return {"bool": False, "item_name": item_name}
+        return {"bool": False, "item_name": "商品名はありません"}
 
 # メッセージの作成
 def create_message(from_addr, to_addr, subject, body_txt):
