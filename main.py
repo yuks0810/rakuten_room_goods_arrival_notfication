@@ -32,7 +32,8 @@ def get_item_quantity():
     bool = False
     としてitem_nameを返す
     """
-    item_name = soup.find(class_='item_name').text
+    # item_name = soup.find(class_='item_name').text
+    item_name = "test texttexttexttexttexttexttexttexttexttexttext"
     if int(item_value) >= 1:
         return {"bool": True, "item_name": item_name}
     else:
