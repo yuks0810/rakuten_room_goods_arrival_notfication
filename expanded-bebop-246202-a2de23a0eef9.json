@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "expanded-bebop-246202",
+  "private_key_id": "a2de23a0eef9220a9a1fd431761fe19c5f74442e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCk9pwvFaI52sK+\n/81jsnWfs7yS95SLvyGAzeHLLffbQh/pIhW4Lf739Y6mMUO547UHYffwblIPCox4\nMZsJjp2drzjvJvDTc3Poj+smrSil/1PI77PrtN44Gt6gFBNVrvpKl0jCQNxo/MxW\nxWOE6AKomZ9eAz7iBJnseeC6TPtyltN46g1HXjv1ae7gDn8/YDjB+iJRPDkWlIxU\nbGrgrhmF8AJKaxqxawWg0Qy4WOsNgf5tCVHufylXPdhqZOOiNFTlU8a1X5GHKMpr\nRjdcgAHzov6dtVH6/3fwYjmtfDbxsJUlePxLk0bESgQEC+7a9aFPIqtkcMVbkusT\nrzh4zSZVAgMBAAECggEAIlBS6h9hpI+q6UB7+HQ/b9YbEGYT/eKmxSxuPo2EDFVr\nnlqy8mIM8oafYtYGDLV/Kzc3dAl6o7rRv9GvunPyOMHhQavTteRC1LoVE7E6rpbX\nFom33vx7Kef67Yjnga/5S8k+vvtvbZ5CIf2Cpzt8jBYSdqONscV7wBsVAiOvvSSp\nXsGhh6oFfvO9zKkBvCB1KS5S3b1hCG+c39Xl3LyJlrwMW0nvXNXs4D8MUBhaGl8I\nx9XgQeGlNIhWOhlG4E/eaQEWwc8HZgwqWvNZu7sQq/IL8zu6rkY59f0dO65E0SOA\nP7ivT1sKk3+v/fGlgSTbcJ703Twno25YPMkFQ0/4SQKBgQDZFwp1EV45Qy5vJ2op\nij5pfok+QR8WNsUGFf4nROUbakxNdVsYNjDba/8leji0m3tnvJW3lnoGHPVT5dXd\nVO9Tub1349+rRrUnifDCm3YUe7g5SkCwaMxRDV+Y3QpLzHAzXcelqj8zHPDEanS+\ndiHBdEySBF+KEpcHAiSC1nUiuQKBgQDCh8nHAxWi4HsK1U6Yt8fuwNLuMWnsUe69\nF/YmYGJkYyqGFvd2c19HD82ieKb1KSWE/OEQXqQ45mWN82WfQU6zIvLlxBAD08bE\nnBxNrZoC5SLmA9V+rMm1RkPnjcspPD2LMpkeGsoBZlcVlsCaNncCve7FMxKNnYSW\n5gMQLiPCfQKBgQClOtU5vythGBIKhgxWa6MPNkENQhGAHdWdyTV0/AoI8MH8nprj\n9bL//tXm13y7ci/eB/pIDl73sijDX4aEfHXf2tormyQNP7b3zhSSejLIalYQPMS5\nwDnqYuxk87A3evXXEsS3AboylA9o38HViSIuFO+Gn498DqQmsGnLr6Dd+QKBgFCd\nYyIlBhdcfcEMiqjBKIqpv//T3HiBr7UPNAPNV5kQe3PcGqssvqQ9SVN2OoJIjfLh\ntQdKoTWvTRCZeFiaANo9tnk/Wf+sCKg7pYMPWU6v1FmL5zK6ulB0EPnpifLJsxt3\nWXrfUS1pUtdwhNqjjYhGW6e/NYYYa/T41vYimNElAoGAYrjAzg/XZY6MBGbDbiKt\n2FF0Dy5TDs7VtCqDt/lHBgpWCRtbV8SrZf8nkgRp6/49671z9f+RJWLIKr4Kkfy1\nxYyJiOAK31eu90+uu88al2D6FiVv76Dnt8opUp36jK36PSMHctn+V20xeCHJgNGi\n6XLn2zVYdi5d4lv9yN+sbgI=\n-----END PRIVATE KEY-----\n",
+  "client_email": "rakuten-goods-notification@expanded-bebop-246202.iam.gserviceaccount.com",
+  "client_id": "109528712036191654253",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/rakuten-goods-notification%40expanded-bebop-246202.iam.gserviceaccount.com"
+}

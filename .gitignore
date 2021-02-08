@@ -136,6 +136,3 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
-# secret_key
-expanded-bebop-246202-a2de23a0eef9.json
