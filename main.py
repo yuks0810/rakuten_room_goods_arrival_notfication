@@ -1,17 +1,43 @@
-import time
-import datetime
-import sys
+import gspread
+import json
 import requests
 from bs4 import BeautifulSoup
 import smtplib
 from email.mime.text import MIMEText
 
-ITEM_URL = "https://item.rakuten.co.jp/finebookpremiere/10003220/?gclid=Cj0KCQiAmfmABhCHARIsACwPRADAlAREiKuQHirblXntpVMoxCAL7Nj993L8Z1DyzqfZYVZezcB5LBYaAir4EALw_wcB&scid=af_pc_etc&sc2id=af_113_0_10001868&icm_acid=288-622-7470&icm_agid=58708966751&icm_cid=1424232125&gclid=Cj0KCQiAmfmABhCHARIsACwPRADAlAREiKuQHirblXntpVMoxCAL7Nj993L8Z1DyzqfZYVZezcB5LBYaAir4EALw_wcB_"
+# ServiceAccountCredentials：Googleの各サービスへアクセスできるservice変数を生成します。
+from oauth2client.service_account import ServiceAccountCredentials
+
+scope = ['https://spreadsheets.google.com/feeds',
+         'https://www.googleapis.com/auth/drive']
+
+# 認証情報設定
+# ダウンロードしたjsonファイル名をクレデンシャル変数に設定（秘密鍵、Pythonファイルから読み込みしやすい位置に置く）
+credentials = ServiceAccountCredentials.from_json_keyfile_name(
+    'expanded-bebop-246202-a2de23a0eef9.json', scope)
+
+# OAuth2の資格情報を使用してGoogle APIにログインします。
+gc = gspread.authorize(credentials)
+
+# 共有設定したスプレッドシートキーを変数[SPREADSHEET_KEY]に格納する。
+SPREADSHEET_KEY = '1rgswOPcI7SHKo3KIKokg9-Pv67YcMitZfTXYEH1ClZ4'
+
+ITEM_URL = "https://item.rakuten.co.jp/hankoya-shop/penpen-wood-01/?iasid=07rpp_10095___ev-kkuorxsc-y8jm-1553edc4-61f7-40ed-a8fb-7ba3a10eb3fb"
 
 my_addr = "dorcushopeino1@gmail.com"
 my_pass = "rwqmoyiqmrvgvrlp"
 
 # アイテムの個数を取得
+
+
+def access_to_google_spread():
+    # 共有設定したスプレッドシートのシート1を開く
+    workbook = gc.open_by_key(SPREADSHEET_KEY)
+    worksheet = workbook.worksheet('通知testシート')
+    import_value = worksheet.acell('A1').value
+    print(import_value)
+
+
 def get_item_quantity():
     r = requests.get(ITEM_URL)
     soup = BeautifulSoup(r.content, "html.parser")
@@ -40,6 +66,8 @@ def get_item_quantity():
         return {"bool": False, "item_name": "商品名はありません"}
 
 # メッセージの作成
+
+
 def create_message(from_addr, to_addr, subject, body_txt):
     msg = MIMEText(body_txt)
     msg["Subject"] = subject
@@ -48,6 +76,8 @@ def create_message(from_addr, to_addr, subject, body_txt):
     return msg
 
 # メールの送信
+
+
 def send_mail(msg):
     with smtplib.SMTP("smtp.gmail.com", 587) as server:
         server.ehlo()
@@ -56,14 +86,20 @@ def send_mail(msg):
         server.login(my_addr, my_pass)
         server.send_message(msg)
 
+
 def main(event, context):
     item_presence = get_item_quantity()
     if item_presence['bool'] is True:
-        msg = create_message(my_addr, my_addr, "商品名のお知らせ", item_presence['item_name'])
+        msg = create_message(my_addr, my_addr, "商品名のお知らせ",
+                             item_presence['item_name'])
     if item_presence['bool'] is False:
-        msg = create_message(my_addr, my_addr, "売り切れのお知らせ", item_presence['item_name'])
+        msg = create_message(my_addr, my_addr, "売り切れのお知らせ",
+                             item_presence['item_name'])
 
     send_mail(msg)
 
+
 # ローカル環境テスト実行用
 # main(event='a', context='a')
+
+access_to_google_spread()

@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 requests = ">=2.22.0"
 beautifulsoup4 = ">=4.8.1"
+oauth2client = "*"
+gspread = "*"
 
 [dev-packages]
 
