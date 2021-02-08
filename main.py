@@ -22,7 +22,7 @@ gc = gspread.authorize(credentials)
 # 共有設定したスプレッドシートキーを変数[SPREADSHEET_KEY]に格納する。
 SPREADSHEET_KEY = '1rgswOPcI7SHKo3KIKokg9-Pv67YcMitZfTXYEH1ClZ4'
 
-ITEM_URL = "https://item.rakuten.co.jp/hankoya-shop/penpen-wood-01/?iasid=07rpp_10095___ev-kkuorxsc-y8jm-1553edc4-61f7-40ed-a8fb-7ba3a10eb3fb"
+# ITEM_URL = "https://item.rakuten.co.jp/hankoya-shop/penpen-wood-01/?iasid=07rpp_10095___ev-kkuorxsc-y8jm-1553edc4-61f7-40ed-a8fb-7ba3a10eb3fb"
 
 my_addr = "dorcushopeino1@gmail.com"
 my_pass = "rwqmoyiqmrvgvrlp"
@@ -34,12 +34,12 @@ def access_to_google_spread():
     # 共有設定したスプレッドシートのシート1を開く
     workbook = gc.open_by_key(SPREADSHEET_KEY)
     worksheet = workbook.worksheet('通知testシート')
-    import_value = worksheet.acell('A1').value
-    print(import_value)
+
+    return worksheet
 
 
-def get_item_quantity():
-    r = requests.get(ITEM_URL)
+def get_item_quantity(item_url):
+    r = requests.get(item_url)
     soup = BeautifulSoup(r.content, "html.parser")
 
     # itemにhtml要素を読み込み、個数が１以上であれば売切れでないと判断
@@ -60,7 +60,7 @@ def get_item_quantity():
     """
     item_name_html = soup.find(class_='item_name')
 
-    if int(item_value) >= 1 and item_name_html != None:
+    if int(item_value) >= 1 and item_name_html is not None:
         return {"bool": True, "item_name": item_name_html.text}
     else:
         return {"bool": False, "item_name": "商品名はありません"}
@@ -88,18 +88,23 @@ def send_mail(msg):
 
 
 def main(event, context):
-    item_presence = get_item_quantity()
+    # google spread sheetに接続
+    worksheet = access_to_google_spread()
+    item_url = worksheet.acell('A2').value
+    rakute_room_url = worksheet.acell('B2').value
+
+    item_presence = get_item_quantity(item_url)
+    item_name = item_presence["item_name"]
+
     if item_presence['bool'] is True:
         msg = create_message(my_addr, my_addr, "商品名のお知らせ",
-                             item_presence['item_name'])
+                             '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url))
     if item_presence['bool'] is False:
         msg = create_message(my_addr, my_addr, "売り切れのお知らせ",
-                             item_presence['item_name'])
+                             '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url))
 
     send_mail(msg)
 
 
 # ローカル環境テスト実行用
 # main(event='a', context='a')
-
-access_to_google_spread()
