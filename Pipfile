@@ -8,6 +8,8 @@ requests = ">=2.22.0"
 beautifulsoup4 = ">=4.8.1"
 oauth2client = "*"
 gspread = "*"
+python-twitter = "*"
+requests-oauthlib = "*"
 
 [dev-packages]
 
