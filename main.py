@@ -118,4 +118,4 @@ def main(event, context):
     api.update_status(msg)
 
 # ローカル環境テスト実行用
-main(event='a', context='a')
+# main(event='a', context='a')
