@@ -10,6 +10,7 @@ oauth2client = "*"
 gspread = "*"
 python-twitter = "*"
 requests-oauthlib = "*"
+tweepy = "*"
 
 [dev-packages]
 

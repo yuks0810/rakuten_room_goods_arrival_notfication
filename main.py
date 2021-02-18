@@ -5,11 +5,13 @@ from bs4 import BeautifulSoup
 import smtplib
 from email.mime.text import MIMEText
 
+import tweepy
+
 # ServiceAccountCredentials：Googleの各サービスへアクセスできるservice変数を生成します。
 from oauth2client.service_account import ServiceAccountCredentials
 
 scope = ['https://spreadsheets.google.com/feeds',
-         'https://www.googleapis.com/auth/drive']
+        'https://www.googleapis.com/auth/drive']
 
 # 認証情報設定
 # ダウンロードしたjsonファイル名をクレデンシャル変数に設定（秘密鍵、Pythonファイルから読み込みしやすい位置に置く）
@@ -66,8 +68,6 @@ def get_item_quantity(item_url):
         return {"bool": False, "item_name": "商品名はありません"}
 
 # メッセージの作成
-
-
 def create_message(from_addr, to_addr, subject, body_txt):
     msg = MIMEText(body_txt)
     msg["Subject"] = subject
@@ -76,8 +76,6 @@ def create_message(from_addr, to_addr, subject, body_txt):
     return msg
 
 # メールの送信
-
-
 def send_mail(msg):
     with smtplib.SMTP("smtp.gmail.com", 587) as server:
         server.ehlo()
@@ -93,18 +91,31 @@ def main(event, context):
     item_url = worksheet.acell('A2').value
     rakute_room_url = worksheet.acell('B2').value
 
+    API_KEY = worksheet.acell('K6').value
+    API_SECRET_KEY = worksheet.acell('K7').value
+    ACCESS_TOKEN = worksheet.acell('K8').value
+    ACCESS_TOKEN_SECRET = worksheet.acell('K9').value
+
     item_presence = get_item_quantity(item_url)
     item_name = item_presence["item_name"]
 
     if item_presence['bool'] is True:
-        msg = create_message(my_addr, my_addr, "商品名のお知らせ",
-                             '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url))
+        # Twitterオブジェクトの生成
+
+        # msg = create_message(my_addr, my_addr, "商品名のお知らせ",
+        #                     '楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url))
+        msg = '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
+                            
     if item_presence['bool'] is False:
-        msg = create_message(my_addr, my_addr, "売り切れのお知らせ",
-                             '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url))
+        # msg = create_message(my_addr, my_addr, "売り切れのお知らせ",
+        #                     '楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url))
+        msg = '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
 
-    send_mail(msg)
-
+    # ツイート
+    auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
+    auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+    api = tweepy.API(auth)
+    api.update_status(msg)
 
 # ローカル環境テスト実行用
-# main(event='a', context='a')
+main(event='a', context='a')
