@@ -2,8 +2,7 @@ import gspread
 import json
 import requests
 from bs4 import BeautifulSoup
-import smtplib
-from email.mime.text import MIMEText
+import settings
 
 import tweepy
 
@@ -23,14 +22,6 @@ gc = gspread.authorize(credentials)
 
 # 共有設定したスプレッドシートキーを変数[SPREADSHEET_KEY]に格納する。
 SPREADSHEET_KEY = '1rgswOPcI7SHKo3KIKokg9-Pv67YcMitZfTXYEH1ClZ4'
-
-# ITEM_URL = "https://item.rakuten.co.jp/hankoya-shop/penpen-wood-01/?iasid=07rpp_10095___ev-kkuorxsc-y8jm-1553edc4-61f7-40ed-a8fb-7ba3a10eb3fb"
-
-my_addr = "dorcushopeino1@gmail.com"
-my_pass = "rwqmoyiqmrvgvrlp"
-
-# アイテムの個数を取得
-
 
 def access_to_google_spread():
     # 共有設定したスプレッドシートのシート1を開く
@@ -117,5 +108,6 @@ def main(event, context):
     api = tweepy.API(auth)
     api.update_status(msg)
 
+
 # ローカル環境テスト実行用
-# main(event='a', context='a')
+main(event='a', context='a')
