@@ -58,34 +58,25 @@ def get_item_quantity(item_url):
     else:
         return {"bool": False, "item_name": "商品名はありません"}
 
-# メッセージの作成
-def create_message(from_addr, to_addr, subject, body_txt):
-    msg = MIMEText(body_txt)
-    msg["Subject"] = subject
-    msg["From"] = from_addr
-    msg["To"] = to_addr
-    return msg
-
-# メールの送信
-def send_mail(msg):
-    with smtplib.SMTP("smtp.gmail.com", 587) as server:
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
-        server.login(my_addr, my_pass)
-        server.send_message(msg)
-
-
 def main(event, context):
     # google spread sheetに接続
+    print('==========商品情報取得==========')
     worksheet = access_to_google_spread()
     item_url = worksheet.acell('A2').value
     rakute_room_url = worksheet.acell('B2').value
+    print('==========商品情報取得 end==========')
 
     API_KEY = worksheet.acell('K6').value
     API_SECRET_KEY = worksheet.acell('K7').value
     ACCESS_TOKEN = worksheet.acell('K8').value
     ACCESS_TOKEN_SECRET = worksheet.acell('K9').value
+
+
+    # .envの値を読み込む
+    API_KEY = settings.API_KEY
+    API_SECRET_KEY = settings.API_KEY_SECRET
+    ACCESS_TOKEN = settings.ACCESS_TOKEN
+    ACCESS_TOKEN_SECRET = settings.ACCESS_TOKEN_SECRET
 
     item_presence = get_item_quantity(item_url)
     item_name = item_presence["item_name"]
@@ -110,4 +101,4 @@ def main(event, context):
 
 
 # ローカル環境テスト実行用
-main(event='a', context='a')
+# main(event='a', context='a')
