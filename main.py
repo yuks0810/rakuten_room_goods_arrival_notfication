@@ -98,12 +98,6 @@ def main(event, context):
     ACCESS_TOKEN_SECRET = worksheet.acell('K9').value
     print('==========twitter情報取得 end==========')
 
-    # .envの値を読み込む
-    API_KEY = settings.API_KEY
-    API_SECRET_KEY = settings.API_KEY_SECRET
-    ACCESS_TOKEN = settings.ACCESS_TOKEN
-    ACCESS_TOKEN_SECRET = settings.ACCESS_TOKEN_SECRET
-
     for i, item_row in enumerate(item_index2d):
         if item_row[0].value == "":
             continue
