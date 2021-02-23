@@ -1,11 +1,9 @@
-import gspread
-import json
-import requests
+import gspread, json, requests
+# import tweepy
+from datetime import datetime as dt
 from bs4 import BeautifulSoup
-import smtplib
-from email.mime.text import MIMEText
-
-import tweepy
+import settings
+import cells_to_arry
 
 # ServiceAccountCredentials：Googleの各サービスへアクセスできるservice変数を生成します。
 from oauth2client.service_account import ServiceAccountCredentials
@@ -24,15 +22,10 @@ gc = gspread.authorize(credentials)
 # 共有設定したスプレッドシートキーを変数[SPREADSHEET_KEY]に格納する。
 SPREADSHEET_KEY = '1rgswOPcI7SHKo3KIKokg9-Pv67YcMitZfTXYEH1ClZ4'
 
-# ITEM_URL = "https://item.rakuten.co.jp/hankoya-shop/penpen-wood-01/?iasid=07rpp_10095___ev-kkuorxsc-y8jm-1553edc4-61f7-40ed-a8fb-7ba3a10eb3fb"
-
-my_addr = "dorcushopeino1@gmail.com"
-my_pass = "rwqmoyiqmrvgvrlp"
-
-# アイテムの個数を取得
-
-
 def access_to_google_spread():
+    '''
+    google spread sheetにアクセスする
+    '''
     # 共有設定したスプレッドシートのシート1を開く
     workbook = gc.open_by_key(SPREADSHEET_KEY)
     worksheet = workbook.worksheet('通知testシート')
@@ -41,6 +34,10 @@ def access_to_google_spread():
 
 
 def get_item_quantity(item_url):
+    '''
+    商品URLの商品在庫があるかどうかを確認する
+    '''
+
     r = requests.get(item_url)
     soup = BeautifulSoup(r.content, "html.parser")
 
@@ -67,55 +64,79 @@ def get_item_quantity(item_url):
     else:
         return {"bool": False, "item_name": "商品名はありません"}
 
-# メッセージの作成
-def create_message(from_addr, to_addr, subject, body_txt):
-    msg = MIMEText(body_txt)
-    msg["Subject"] = subject
-    msg["From"] = from_addr
-    msg["To"] = to_addr
-    return msg
+def tweetable(last_tweet_date):
+    '''
+    30分以内にtweetしたかどうかを判断する
+    '''
 
-# メールの送信
-def send_mail(msg):
-    with smtplib.SMTP("smtp.gmail.com", 587) as server:
-        server.ehlo()
-        server.starttls()
-        server.ehlo()
-        server.login(my_addr, my_pass)
-        server.send_message(msg)
+    if not last_tweet_date:
+        return True
 
+    last_tweet_date = dt.strptime(last_tweet_date, '%Y/%m/%d %H:%M:%S')
+    timegap = last_tweet_date - dt.now()
+    if timegap.seconds > 1800:
+        return True
+    else:
+        return False
 
 def main(event, context):
     # google spread sheetに接続
+    print('==========商品情報取得==========')
     worksheet = access_to_google_spread()
     item_url = worksheet.acell('A2').value
     rakute_room_url = worksheet.acell('B2').value
+    print('==========商品情報取得 end==========')
+    
+    # 商品の一覧の範囲を取得
+    item_index = worksheet.range('A2:F10')
+    item_index2d = cells_to_arry.cellsto2darray(item_index, 6)
 
+    print('==========twitter情報取得==========')
     API_KEY = worksheet.acell('K6').value
     API_SECRET_KEY = worksheet.acell('K7').value
     ACCESS_TOKEN = worksheet.acell('K8').value
     ACCESS_TOKEN_SECRET = worksheet.acell('K9').value
+    print('==========twitter情報取得 end==========')
 
-    item_presence = get_item_quantity(item_url)
-    item_name = item_presence["item_name"]
+    # .envの値を読み込む
+    API_KEY = settings.API_KEY
+    API_SECRET_KEY = settings.API_KEY_SECRET
+    ACCESS_TOKEN = settings.ACCESS_TOKEN
+    ACCESS_TOKEN_SECRET = settings.ACCESS_TOKEN_SECRET
 
-    if item_presence['bool'] is True:
-        # Twitterオブジェクトの生成
+    for i, item_row in enumerate(item_index2d):
+        if item_row[0].value == "":
+            continue
 
-        # msg = create_message(my_addr, my_addr, "商品名のお知らせ",
-        #                     '楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url))
-        msg = '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
-                            
-    if item_presence['bool'] is False:
-        # msg = create_message(my_addr, my_addr, "売り切れのお知らせ",
-        #                     '楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url))
-        msg = '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
+        item_presence = get_item_quantity(item_row[0].value)
+        item_name = item_presence["item_name"]
 
-    # ツイート
-    auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
-    auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-    api = tweepy.API(auth)
-    api.update_status(msg)
+        if item_presence['bool'] is True:
+            msg = '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
+            
+            if tweetable(item_row[4].value):
+                tdatetime = dt.now()
+                tstr = tdatetime.strftime('%Y/%m/%d %H:%M:%S')
+                item_row[4].value = tstr
+                item_row[5].value = "不可"
+
+                # ツイート
+                # auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
+                # auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+                # api = tweepy.API(auth)
+                # api.update_status(msg)
+                print('=====SpreadSheetに書き込みを行いました=====')
+                                
+        if item_presence['bool'] is False:
+            msg = '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
+            item_row[5].value = "可能"
+
+    # 二次元になっているリストを１次元に直す
+    # 二次元だと書き込めない
+    item_index1d = cells_to_arry.cellsto1darray(item_index2d)
+    
+    # スプレッドシートを更新
+    worksheet.update_cells(item_index1d)
 
 # ローカル環境テスト実行用
-main(event='a', context='a')
+# main(event='a', context='a')
