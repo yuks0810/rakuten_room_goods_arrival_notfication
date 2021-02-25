@@ -1,5 +1,5 @@
 import gspread, json, requests
-# import tweepy
+import tweepy
 from datetime import datetime as dt
 from bs4 import BeautifulSoup
 import settings
@@ -92,10 +92,10 @@ def main(event, context):
     item_index2d = cells_to_arry.cellsto2darray(item_index, 6)
 
     print('==========twitter情報取得==========')
-    API_KEY = worksheet.acell('K6').value
-    API_SECRET_KEY = worksheet.acell('K7').value
-    ACCESS_TOKEN = worksheet.acell('K8').value
-    ACCESS_TOKEN_SECRET = worksheet.acell('K9').value
+    API_KEY = worksheet.acell('I5').value
+    API_SECRET_KEY = worksheet.acell('I6').value
+    ACCESS_TOKEN = worksheet.acell('I7').value
+    ACCESS_TOKEN_SECRET = worksheet.acell('I8').value
     print('==========twitter情報取得 end==========')
 
     for i, item_row in enumerate(item_index2d):
@@ -115,10 +115,10 @@ def main(event, context):
                 item_row[5].value = "不可"
 
                 # ツイート
-                # auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
-                # auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-                # api = tweepy.API(auth)
-                # api.update_status(msg)
+                auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
+                auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+                api = tweepy.API(auth)
+                api.update_status(msg)
                 print('=====SpreadSheetに書き込みを行いました=====')
                                 
         if item_presence['bool'] is False:
@@ -133,4 +133,4 @@ def main(event, context):
     worksheet.update_cells(item_index1d)
 
 # ローカル環境テスト実行用
-# main(event='a', context='a')
+main(event='a', context='a')
