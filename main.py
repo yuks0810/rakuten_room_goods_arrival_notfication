@@ -107,6 +107,8 @@ def main(event, context):
         rakute_room_url = item_row[1].value
 
         if item_presence['bool'] is True:
+            
+            # twitterに投稿する内容
             msg = '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
             
             if tweetable(item_row[4].value):
