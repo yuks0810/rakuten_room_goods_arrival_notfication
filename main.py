@@ -1,4 +1,4 @@
-import gspread, json, requests
+import gspread, json, requests, random, string
 import tweepy
 from datetime import datetime as dt
 from bs4 import BeautifulSoup
@@ -79,6 +79,13 @@ def tweetable(last_tweet_date):
     else:
         return False
 
+def GetRandomStr(num):
+    # 英数字をすべて取得
+    dat = string.digits + string.ascii_lowercase + string.ascii_uppercase
+
+    # 英数字からランダムに取得
+    return ''.join([random.choice(dat) for i in range(num)])
+
 def main(event, context):
     # google spread sheetに接続
     print('==========商品情報取得==========')
@@ -105,12 +112,12 @@ def main(event, context):
         item_presence = get_item_quantity(item_row[0].value)
         item_name = item_presence["item_name"]
         rakute_room_url = item_row[1].value
+        rakute_room_url2 = item_row[2].value
 
         if item_presence['bool'] is True:
-            
+            rand_str = GetRandomStr(2)
             # twitterに投稿する内容
-            msg = '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
-            
+            msg = '{item_name}{rand_str}\r\n急ぎの方こちら↓\r\n{rakute_room_url2}\r\n{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url, rand_str=rand_str, rakute_room_url2=rakute_room_url2)
             if tweetable(item_row[4].value):
                 tdatetime = dt.now()
                 tstr = tdatetime.strftime('%Y/%m/%d %H:%M:%S')
@@ -125,7 +132,7 @@ def main(event, context):
                 print('=====SpreadSheetに書き込みを行いました=====')
                                 
         if item_presence['bool'] is False:
-            msg = '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
+            msg = '{item_name} {rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
             item_row[5].value = "可能"
 
     # 二次元になっているリストを１次元に直す
@@ -136,4 +143,4 @@ def main(event, context):
     worksheet.update_cells(item_index1d)
 
 # ローカル環境テスト実行用
-# main(event='a', context='a')
+main(event='a', context='a')
