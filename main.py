@@ -104,6 +104,7 @@ def main(event, context):
 
         item_presence = get_item_quantity(item_row[0].value)
         item_name = item_presence["item_name"]
+        rakute_room_url = item_row[1].value
 
         if item_presence['bool'] is True:
             msg = '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
