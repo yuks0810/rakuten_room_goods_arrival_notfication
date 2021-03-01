@@ -143,4 +143,4 @@ def main(event, context):
     worksheet.update_cells(item_index1d)
 
 # ローカル環境テスト実行用
-main(event='a', context='a')
+# main(event='a', context='a')
