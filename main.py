@@ -64,6 +64,7 @@ def get_item_quantity(item_url):
     else:
         return {"bool": False, "item_name": "商品名はありません"}
 
+<<<<<<< HEAD
 def tweetable(last_tweet_date):
     '''
     30分以内にtweetしたかどうかを判断する
@@ -86,6 +87,8 @@ def GetRandomStr(num):
     # 英数字からランダムに取得
     return ''.join([random.choice(dat) for i in range(num)])
 
+=======
+>>>>>>> f333441daa12961da249fbebe69e1f910958c0be
 def main(event, context):
     # google spread sheetに接続
     print('==========商品情報取得==========')
@@ -93,6 +96,7 @@ def main(event, context):
     item_url = worksheet.acell('A2').value
     rakute_room_url = worksheet.acell('B2').value
     print('==========商品情報取得 end==========')
+<<<<<<< HEAD
     
     # 商品の一覧の範囲を取得
     item_index = worksheet.range('A2:F10')
@@ -141,6 +145,42 @@ def main(event, context):
     
     # スプレッドシートを更新
     worksheet.update_cells(item_index1d)
+=======
+
+    API_KEY = worksheet.acell('K6').value
+    API_SECRET_KEY = worksheet.acell('K7').value
+    ACCESS_TOKEN = worksheet.acell('K8').value
+    ACCESS_TOKEN_SECRET = worksheet.acell('K9').value
+
+
+    # .envの値を読み込む
+    API_KEY = settings.API_KEY
+    API_SECRET_KEY = settings.API_KEY_SECRET
+    ACCESS_TOKEN = settings.ACCESS_TOKEN
+    ACCESS_TOKEN_SECRET = settings.ACCESS_TOKEN_SECRET
+
+    item_presence = get_item_quantity(item_url)
+    item_name = item_presence["item_name"]
+
+    if item_presence['bool'] is True:
+        # Twitterオブジェクトの生成
+
+        # msg = create_message(my_addr, my_addr, "商品名のお知らせ",
+        #                     '楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url))
+        msg = '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
+                            
+    if item_presence['bool'] is False:
+        # msg = create_message(my_addr, my_addr, "売り切れのお知らせ",
+        #                     '楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url))
+        msg = '{item_name} 楽天ROOM:{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
+
+    # ツイート
+    auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
+    auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+    api = tweepy.API(auth)
+    api.update_status(msg)
+>>>>>>> f333441daa12961da249fbebe69e1f910958c0be
+
 
 # ローカル環境テスト実行用
 # main(event='a', context='a')
