@@ -152,10 +152,10 @@ def main(event, context):
                 item_row[5].value = "不可"
 
                 # ツイート
-                # auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
-                # auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-                # api = tweepy.API(auth)
-                # api.update_status(msg)
+                auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
+                auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+                api = tweepy.API(auth)
+                api.update_status(msg)
                 print('=====SpreadSheetに書き込みを行いました=====')
                                 
         if item_presence['bool'] is False:
