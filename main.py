@@ -1,6 +1,7 @@
 import gspread, json, requests, random, string
 import tweepy
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta, timezone
+import datetime
 from bs4 import BeautifulSoup
 import settings
 import cells_to_arry
@@ -10,6 +11,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 
 scope = ['https://spreadsheets.google.com/feeds',
         'https://www.googleapis.com/auth/drive']
+
+JST = timezone(timedelta(hours=+9), 'JST')
 
 # 認証情報設定
 # ダウンロードしたjsonファイル名をクレデンシャル変数に設定（秘密鍵、Pythonファイルから読み込みしやすい位置に置く）
@@ -31,6 +34,20 @@ def access_to_google_spread():
     worksheet = workbook.worksheet('通知testシート')
 
     return worksheet
+
+def get_current_date():
+    # 日本時間で現在時間を取得する
+    timenow = dt.now(JST)
+    current_time_in_datetime = datetime.datetime(
+                                year=timenow.year, 
+                                month=timenow.month, 
+                                day=timenow.day, 
+                                hour=timenow.hour, 
+                                minute=timenow.minute, 
+                                second=timenow.second
+                                )
+                                
+    return current_time_in_datetime
 
 
 def get_item_quantity(item_url):
@@ -73,7 +90,14 @@ def tweetable(last_tweet_date):
         return True
 
     last_tweet_date = dt.strptime(last_tweet_date, '%Y/%m/%d %H:%M:%S')
-    timegap = last_tweet_date - dt.now()
+
+    datetime_now = get_current_date()
+    datetime_last_tweet_date = datetime.datetime(year=last_tweet_date.year, month=last_tweet_date.month, day=last_tweet_date.day, hour=last_tweet_date.hour, minute=last_tweet_date.minute, second=last_tweet_date.second)
+
+    # スプレッドシートに記載されている時間と、JSTの現在時刻を比較
+    timegap = datetime_now - datetime_last_tweet_date
+
+    # 30分以上の差があればTrueとする
     if timegap.seconds > 1800:
         return True
     else:
@@ -106,7 +130,7 @@ def main(event, context):
     print('==========twitter情報取得 end==========')
 
     for i, item_row in enumerate(item_index2d):
-        if item_row[0].value == "":
+        if item_row[0].value == "" or tweetable(item_row[4].value) is False:
             continue
 
         item_presence = get_item_quantity(item_row[0].value)
@@ -116,19 +140,22 @@ def main(event, context):
 
         if item_presence['bool'] is True:
             rand_str = GetRandomStr(2)
+
             # twitterに投稿する内容
             msg = '{item_name}{rand_str}\r\n急ぎの方こちら↓\r\n{rakute_room_url2}\r\n{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url, rand_str=rand_str, rakute_room_url2=rakute_room_url2)
+            
+            print(f"tweet可能？：{tweetable(item_row[4].value)}")
             if tweetable(item_row[4].value):
-                tdatetime = dt.now()
+                tdatetime = get_current_date()
                 tstr = tdatetime.strftime('%Y/%m/%d %H:%M:%S')
                 item_row[4].value = tstr
                 item_row[5].value = "不可"
 
                 # ツイート
-                auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
-                auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
-                api = tweepy.API(auth)
-                api.update_status(msg)
+                # auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
+                # auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
+                # api = tweepy.API(auth)
+                # api.update_status(msg)
                 print('=====SpreadSheetに書き込みを行いました=====')
                                 
         if item_presence['bool'] is False:
