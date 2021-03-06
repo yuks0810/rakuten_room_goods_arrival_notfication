@@ -10,8 +10,8 @@ jobs:
       - uses: pixta-dev/repository-mirroring-action@v1
         with:
           target_repo_url:
-            ssh://git-codecommit.us-east-1.amazonaws.com/v1/repos/test_repo
+            ssh://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/xxxxx
           ssh_private_key:
-            ${{ secrets.CODE_COMMIT_SSH_IDENTITY_FILE }}
+            ${{ secrets.CODECOMMIT_SSH_PRIVATE_KEY }}
           ssh_username:
-            ${{ secrets.CODECOMMIT_SSH_KEY_ID }}
+            ${{ secrets.CODECOMMIT_SSH_PRIVATE_KEY_ID }}
