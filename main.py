@@ -123,10 +123,10 @@ def main(event, context):
     item_index2d = cells_to_arry.cellsto2darray(item_index, 7)
 
     print('==========twitter情報取得==========')
-    API_KEY = worksheet.acell('I5').value
-    API_SECRET_KEY = worksheet.acell('I6').value
-    ACCESS_TOKEN = worksheet.acell('I7').value
-    ACCESS_TOKEN_SECRET = worksheet.acell('I8').value
+    API_KEY = worksheet.acell('J5').value
+    API_SECRET_KEY = worksheet.acell('J6').value
+    ACCESS_TOKEN = worksheet.acell('J7').value
+    ACCESS_TOKEN_SECRET = worksheet.acell('J8').value
     print('==========twitter情報取得 end==========')
 
     for i, item_row in enumerate(item_index2d):
