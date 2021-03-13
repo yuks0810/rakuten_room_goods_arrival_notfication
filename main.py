@@ -143,7 +143,7 @@ def main(event, context):
             rand_str = GetRandomStr(2)
 
             # twitterに投稿する内容
-            msg = '{item_name}{rand_str}\r\n急ぎの方こちら↓\r\n{rakute_room_url2}\r\n{rakute_room_url}'.format(item_name=item_name[:50], rakute_room_url=rakute_room_url, rand_str=rand_str, rakute_room_url2=rakute_room_url2)
+            msg = '{item_name}{rand_str}\r\n急ぎの方こちら↓\r\n{rakute_room_url2}\r\n{rakute_room_url}'.format(item_name=item_name[:90], rakute_room_url=rakute_room_url, rand_str=rand_str, rakute_room_url2=rakute_room_url2)
             
             print(f"tweet可能？：{tweetable(item_row[4].value)}")
             if tweetable(item_row[4].value):
