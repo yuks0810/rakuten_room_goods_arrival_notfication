@@ -119,8 +119,8 @@ def main(event, context):
     print('==========商品情報取得 end==========')
     
     # 商品の一覧の範囲を取得
-    item_index = worksheet.range('A2:F10')
-    item_index2d = cells_to_arry.cellsto2darray(item_index, 6)
+    item_index = worksheet.range('A2:G10')
+    item_index2d = cells_to_arry.cellsto2darray(item_index, 7)
 
     print('==========twitter情報取得==========')
     API_KEY = worksheet.acell('I5').value
@@ -137,12 +137,13 @@ def main(event, context):
         item_name = item_presence["item_name"]
         rakute_room_url = item_row[1].value
         rakute_room_url2 = item_row[2].value
+        tweetable_words_length = item_row[6]
 
         if item_presence['bool'] is True:
             rand_str = GetRandomStr(2)
 
             # twitterに投稿する内容
-            msg = '{item_name}{rand_str}\r\n急ぎの方こちら↓\r\n{rakute_room_url2}\r\n{rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url, rand_str=rand_str, rakute_room_url2=rakute_room_url2)
+            msg = '{item_name}{rand_str}\r\n急ぎの方こちら↓\r\n{rakute_room_url2}\r\n{rakute_room_url}'.format(item_name=item_name[:50], rakute_room_url=rakute_room_url, rand_str=rand_str, rakute_room_url2=rakute_room_url2)
             
             print(f"tweet可能？：{tweetable(item_row[4].value)}")
             if tweetable(item_row[4].value):
