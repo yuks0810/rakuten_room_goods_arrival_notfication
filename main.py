@@ -1,10 +1,14 @@
-import gspread, json, requests, random, string
+import gspread, json, random, string
 import tweepy
 from datetime import datetime as dt, timedelta, timezone
 import datetime
-from bs4 import BeautifulSoup
-import settings
+import settings # dotenv
 import cells_to_arry
+
+# from bs4 import BeautifulSoup
+# import requests
+
+from BeautifulSoup4Codes.bs4_website_scraper import RakutenBooksScraper, RakutenIchibaScraper
 
 # ServiceAccountCredentials：Googleの各サービスへアクセスできるservice変数を生成します。
 from oauth2client.service_account import ServiceAccountCredentials
@@ -25,6 +29,7 @@ gc = gspread.authorize(credentials)
 # 共有設定したスプレッドシートキーを変数[SPREADSHEET_KEY]に格納する。
 SPREADSHEET_KEY = '1rgswOPcI7SHKo3KIKokg9-Pv67YcMitZfTXYEH1ClZ4'
 
+
 def access_to_google_spread():
     '''
     google spread sheetにアクセスする
@@ -34,6 +39,7 @@ def access_to_google_spread():
     worksheet = workbook.worksheet('通知testシート')
 
     return worksheet
+
 
 def get_current_date():
     # 日本時間で現在時間を取得する
@@ -74,12 +80,13 @@ def get_item_quantity(item_url):
     bool = False
     としてitem_nameを返す
     """
-    item_name_html = soup.find(class_='item_name')
+    item_name_html_tag = soup.find(class_='item_name')
 
-    if int(item_value) >= 1 and item_name_html is not None:
-        return {"bool": True, "item_name": item_name_html.text}
+    if int(item_value) >= 1 and item_name_html_tag is not None:
+        return {"bool": True, "item_name": item_name_html_tag.text}
     else:
         return {"bool": False, "item_name": "商品名はありません"}
+
 
 def tweetable(last_tweet_date):
     '''
@@ -103,14 +110,28 @@ def tweetable(last_tweet_date):
     else:
         return False
 
+
 def GetRandomStr(num):
+
+    '''
+    twitterで同じ文章を連投できないのでランダムな２文字の文字列を
+    文章の末尾に追加してエラーを回避するためのもの
+    '''
+
     # 英数字をすべて取得
     dat = string.digits + string.ascii_lowercase + string.ascii_uppercase
 
     # 英数字からランダムに取得
     return ''.join([random.choice(dat) for i in range(num)])
 
+
 def main(event, context):
+
+    '''
+    メイン関数
+    event, contextは "GCP cloud Function" で動かすのに必要な引数
+    '''
+
     # google spread sheetに接続
     print('==========商品情報取得==========')
     worksheet = access_to_google_spread()
@@ -132,14 +153,31 @@ def main(event, context):
     for i, item_row in enumerate(item_index2d):
         if item_row[0].value == "" or tweetable(item_row[4].value) is False:
             continue
+        
+        item_url = item_row[0].value
 
-        item_presence = get_item_quantity(item_row[0].value)
-        item_name = item_presence["item_name"]
+        if "books.rakuten.co.jp" in item_url:
+            # 楽天ブックスの場合
+            print('=====楽天ブックススクレイピング start=====')
+            rakute_bools_scraper = RakutenBooksScraper(item_url=item_url)
+            sold_out = rakute_bools_scraper.is_sold_out()
+            item_name = rakute_bools_scraper.get_item_name()
+
+        elif "item.rakuten.co.jp" in item_url:
+            # 楽天市場の場合
+            print('=====楽天スクレイピング start=====')
+            rakute_ichiba_scraper = RakutenIchibaScraper(item_url=item_url)
+            sold_out = rakute_ichiba_scraper.is_sold_out()
+            item_name = rakute_ichiba_scraper.get_item_name()
+            print('=====楽天スクレイピング end=====')
+        else:
+            continue
+        
         rakute_room_url = item_row[1].value
         rakute_room_url2 = item_row[2].value
         tweetable_words_length = item_row[6]
 
-        if item_presence['bool'] is True:
+        if sold_out is False:
             rand_str = GetRandomStr(2)
 
             # twitterに投稿する内容
@@ -152,6 +190,12 @@ def main(event, context):
                 item_row[4].value = tstr
                 item_row[5].value = "不可"
 
+                # テスト用（.envから読み取っている）
+                API_KEY = settings.API_KEY
+                AIP_KEY_SECRET = settings.API_KEY_SECRET
+                ACCESS_TOKEN = settings.ACCESS_TOKEN
+                ACCESS_TOKEN_SECRET = settings.ACCESS_TOKEN_SECRET
+
                 # ツイート
                 auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
                 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
@@ -159,7 +203,7 @@ def main(event, context):
                 api.update_status(msg)
                 print('=====SpreadSheetに書き込みを行いました=====')
                                 
-        if item_presence['bool'] is False:
+        if sold_out is True:
             msg = '{item_name} {rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
             item_row[5].value = "可能"
 
@@ -171,4 +215,4 @@ def main(event, context):
     worksheet.update_cells(item_index1d)
 
 # ローカル環境テスト実行用
-# main(event='a', context='a')
+main(event='a', context='a')
