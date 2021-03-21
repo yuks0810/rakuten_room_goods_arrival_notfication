@@ -7,6 +7,17 @@ import cells_to_arry
 
 from BeautifulSoup4Codes.bs4_website_scraper import RakutenBooksScraper, RakutenIchibaScraper
 
+from BeautifulSoup4Codes.bs4_website_scraper_selenium import SeleniumRakutenBooksScraper, SeleniumIchibaScraper
+
+# Chrome Driverの最新を自動で更新する
+import webdriver_installer
+
+# Chrome Driverのために必要
+import chromedriver_binary
+from selenium.webdriver.chrome.options import Options # chromeをヘッドレスモードで実行するときのオプションのために必要
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+
 # ServiceAccountCredentials：Googleの各サービスへアクセスできるservice変数を生成します。
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -25,6 +36,19 @@ gc = gspread.authorize(credentials)
 
 # 共有設定したスプレッドシートキーを変数[SPREADSHEET_KEY]に格納する。
 SPREADSHEET_KEY = '1rgswOPcI7SHKo3KIKokg9-Pv67YcMitZfTXYEH1ClZ4'
+
+def auto_renew_chrome_driver():
+        '''
+        Chrome Driverの自動更新を実行
+        '''
+
+        # ヘッドレス起動のためのオプションを用意
+        option = Options()                          
+        option.add_argument('--headless')   
+
+        # Chrome Driver
+        driver = webdriver.Chrome(ChromeDriverManager().install(), options=option)
+        return driver
 
 
 def access_to_google_spread():
@@ -51,38 +75,6 @@ def get_current_date():
                                 )
                                 
     return current_time_in_datetime
-
-
-def get_item_quantity(item_url):
-    '''
-    商品URLの商品在庫があるかどうかを確認する
-    '''
-
-    r = requests.get(item_url)
-    soup = BeautifulSoup(r.content, "html.parser")
-
-    # itemにhtml要素を読み込み、個数が１以上であれば売切れでないと判断
-    item = soup.find('input', class_='rItemUnits')
-    if item == None:
-        item_value = 0
-    else:
-        item_value = item['value']
-
-    """
-    商品が売切れでない時は
-    bool = True
-    としてitem_nameを返す
-
-    売り切れの場合は
-    bool = False
-    としてitem_nameを返す
-    """
-    item_name_html_tag = soup.find(class_='item_name')
-
-    if int(item_value) >= 1 and item_name_html_tag is not None:
-        return {"bool": True, "item_name": item_name_html_tag.text}
-    else:
-        return {"bool": False, "item_name": "商品名はありません"}
 
 
 def tweetable(last_tweet_date):
@@ -123,12 +115,12 @@ def GetRandomStr(num):
 
 
 def main(event, context):
-
     '''
     メイン関数
     event, contextは "GCP cloud Function" で動かすのに必要な引数
     '''
-
+    driver = auto_renew_chrome_driver()
+    
     # google spread sheetに接続
     print('==========商品情報取得==========')
     worksheet = access_to_google_spread()
@@ -153,10 +145,29 @@ def main(event, context):
         
         item_url = item_row[0].value
 
+        # if "books.rakuten.co.jp" in item_url:
+        #     # 楽天ブックスの場合
+        #     print('=====楽天ブックススクレイピング start=====')
+        #     rakute_bools_scraper = RakutenBooksScraper(item_url=item_url)
+        #     sold_out = rakute_bools_scraper.is_sold_out()
+        #     item_name = rakute_bools_scraper.get_item_name()
+        #     print(f"sold_out: {sold_out}")
+        #     print('=====楽天ブックススクレイピング end=====')
+
+        # elif "item.rakuten.co.jp" in item_url:
+        #     # 楽天市場の場合
+        #     print('=====楽天市場スクレイピング start=====')
+        #     rakute_ichiba_scraper = RakutenIchibaScraper(item_url=item_url)
+        #     sold_out = rakute_ichiba_scraper.is_sold_out()
+        #     item_name = rakute_ichiba_scraper.get_item_name()
+        #     print('=====楽天市場スクレイピング end=====')
+        # else:
+        #     continue
+        
         if "books.rakuten.co.jp" in item_url:
             # 楽天ブックスの場合
             print('=====楽天ブックススクレイピング start=====')
-            rakute_bools_scraper = RakutenBooksScraper(item_url=item_url)
+            rakute_bools_scraper = SeleniumRakutenBooksScraper(item_url=item_url, driver=driver)
             sold_out = rakute_bools_scraper.is_sold_out()
             item_name = rakute_bools_scraper.get_item_name()
             print(f"sold_out: {sold_out}")
@@ -165,13 +176,14 @@ def main(event, context):
         elif "item.rakuten.co.jp" in item_url:
             # 楽天市場の場合
             print('=====楽天市場スクレイピング start=====')
-            rakute_ichiba_scraper = RakutenIchibaScraper(item_url=item_url)
+            rakute_ichiba_scraper = SeleniumIchibaScraper(item_url=item_url, driver=driver)
             sold_out = rakute_ichiba_scraper.is_sold_out()
             item_name = rakute_ichiba_scraper.get_item_name()
+            print(f"sold_out: {sold_out}")
             print('=====楽天市場スクレイピング end=====')
         else:
             continue
-        
+
         rakute_room_url = item_row[1].value
         rakute_room_url2 = item_row[2].value
         tweetable_words_length = item_row[6]

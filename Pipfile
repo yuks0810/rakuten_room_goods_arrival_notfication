@@ -13,6 +13,8 @@ requests-oauthlib = "*"
 tweepy = "*"
 python-dotenv = "*"
 lxml = "*"
+selenium = "*"
+chromedriver-binary = "*"
 
 [dev-packages]
 
