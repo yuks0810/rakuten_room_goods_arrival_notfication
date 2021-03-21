@@ -5,9 +5,7 @@ import datetime
 import settings # dotenv
 import cells_to_arry
 
-from BeautifulSoup4Codes.bs4_website_scraper import RakutenBooksScraper, RakutenIchibaScraper
-
-from BeautifulSoup4Codes.bs4_website_scraper_selenium import SeleniumRakutenBooksScraper, SeleniumIchibaScraper
+from SeleniumDir.website_scraper_selenium import SeleniumRakutenBooksScraper, SeleniumIchibaScraper
 
 # Chrome Driverの最新を自動で更新する
 import webdriver_installer
@@ -132,6 +130,12 @@ def main(event, context):
     item_index = worksheet.range('A2:G10')
     item_index2d = cells_to_arry.cellsto2darray(item_index, 7)
 
+    # テスト用（.envから読み取っている）
+    # API_KEY = settings.API_KEY
+    # AIP_KEY_SECRET = settings.API_KEY_SECRET
+    # ACCESS_TOKEN = settings.ACCESS_TOKEN
+    # ACCESS_TOKEN_SECRET = settings.ACCESS_TOKEN_SECRET
+
     print('==========twitter情報取得==========')
     API_KEY = worksheet.acell('J5').value
     API_SECRET_KEY = worksheet.acell('J6').value
@@ -144,25 +148,6 @@ def main(event, context):
             continue
         
         item_url = item_row[0].value
-
-        # if "books.rakuten.co.jp" in item_url:
-        #     # 楽天ブックスの場合
-        #     print('=====楽天ブックススクレイピング start=====')
-        #     rakute_bools_scraper = RakutenBooksScraper(item_url=item_url)
-        #     sold_out = rakute_bools_scraper.is_sold_out()
-        #     item_name = rakute_bools_scraper.get_item_name()
-        #     print(f"sold_out: {sold_out}")
-        #     print('=====楽天ブックススクレイピング end=====')
-
-        # elif "item.rakuten.co.jp" in item_url:
-        #     # 楽天市場の場合
-        #     print('=====楽天市場スクレイピング start=====')
-        #     rakute_ichiba_scraper = RakutenIchibaScraper(item_url=item_url)
-        #     sold_out = rakute_ichiba_scraper.is_sold_out()
-        #     item_name = rakute_ichiba_scraper.get_item_name()
-        #     print('=====楽天市場スクレイピング end=====')
-        # else:
-        #     continue
         
         if "books.rakuten.co.jp" in item_url:
             # 楽天ブックスの場合
@@ -170,7 +155,6 @@ def main(event, context):
             rakute_bools_scraper = SeleniumRakutenBooksScraper(item_url=item_url, driver=driver)
             sold_out = rakute_bools_scraper.is_sold_out()
             item_name = rakute_bools_scraper.get_item_name()
-            print(f"sold_out: {sold_out}")
             print('=====楽天ブックススクレイピング end=====')
 
         elif "item.rakuten.co.jp" in item_url:
@@ -179,7 +163,6 @@ def main(event, context):
             rakute_ichiba_scraper = SeleniumIchibaScraper(item_url=item_url, driver=driver)
             sold_out = rakute_ichiba_scraper.is_sold_out()
             item_name = rakute_ichiba_scraper.get_item_name()
-            print(f"sold_out: {sold_out}")
             print('=====楽天市場スクレイピング end=====')
         else:
             continue
@@ -202,12 +185,6 @@ def main(event, context):
                 item_row[4].value = tstr
                 item_row[5].value = "不可"
 
-                # テスト用（.envから読み取っている）
-                API_KEY = settings.API_KEY
-                AIP_KEY_SECRET = settings.API_KEY_SECRET
-                ACCESS_TOKEN = settings.ACCESS_TOKEN
-                ACCESS_TOKEN_SECRET = settings.ACCESS_TOKEN_SECRET
-
                 # ツイート
                 auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
                 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
@@ -227,4 +204,4 @@ def main(event, context):
     worksheet.update_cells(item_index1d)
 
 # ローカル環境テスト実行用
-main(event='a', context='a')
+# main(event='a', context='a')
