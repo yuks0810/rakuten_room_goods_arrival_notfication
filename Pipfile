@@ -12,6 +12,7 @@ python-twitter = "*"
 requests-oauthlib = "*"
 tweepy = "*"
 python-dotenv = "*"
+lxml = "*"
 
 [dev-packages]
 

@@ -5,9 +5,6 @@ import datetime
 import settings # dotenv
 import cells_to_arry
 
-# from bs4 import BeautifulSoup
-# import requests
-
 from BeautifulSoup4Codes.bs4_website_scraper import RakutenBooksScraper, RakutenIchibaScraper
 
 # ServiceAccountCredentials：Googleの各サービスへアクセスできるservice変数を生成します。
@@ -162,14 +159,16 @@ def main(event, context):
             rakute_bools_scraper = RakutenBooksScraper(item_url=item_url)
             sold_out = rakute_bools_scraper.is_sold_out()
             item_name = rakute_bools_scraper.get_item_name()
+            print(f"sold_out: {sold_out}")
+            print('=====楽天ブックススクレイピング end=====')
 
         elif "item.rakuten.co.jp" in item_url:
             # 楽天市場の場合
-            print('=====楽天スクレイピング start=====')
+            print('=====楽天市場スクレイピング start=====')
             rakute_ichiba_scraper = RakutenIchibaScraper(item_url=item_url)
             sold_out = rakute_ichiba_scraper.is_sold_out()
             item_name = rakute_ichiba_scraper.get_item_name()
-            print('=====楽天スクレイピング end=====')
+            print('=====楽天市場スクレイピング end=====')
         else:
             continue
         
@@ -178,6 +177,7 @@ def main(event, context):
         tweetable_words_length = item_row[6]
 
         if sold_out is False:
+            print("=====在庫あり=====")
             rand_str = GetRandomStr(2)
 
             # twitterに投稿する内容
