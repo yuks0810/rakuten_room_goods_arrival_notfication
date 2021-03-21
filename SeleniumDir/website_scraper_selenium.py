@@ -26,27 +26,38 @@ class SeleniumRakutenBooksScraper:
         '''
 
         # itemにhtml要素を読み込み、個数が１以上であれば売切れでないと判断
-        item = self.driver.find_element_by_css_selector(self.target_html_tag)
-        if item == None:
-            item_value = 0
-            return True # 売り切れ
-        else:
-            item_value = item.get_attribute('value')
-            return False # 在庫あり
+
+        try:
+            # 要素がある場合の処理
+            item = self.driver.find_element_by_css_selector(self.target_html_tag)
+            if item == None:
+                item_value = 0
+                return True # 売り切れ
+            else:
+                item_value = item.get_attribute('value')
+                return False # 在庫あり
+        except:
+            print('個数表示inputを取得できませんでした。')
 
 
     def get_item_name(self) -> str:
         '''
         商品名をページ上から取得してくる
         '''
-        item_name_bs4 = self.driver.find_element_by_xpath(self.item_name_html_tag)
+        try:
+            # 要素がある場合の処理
+            item_name_bs4 = self.driver.find_element_by_xpath(self.item_name_html_tag)
 
-        if item_name_bs4 is not None:
-            item_name = item_name_bs4.text
-            print(f"item_name: {item_name}")
-            return item_name
-        else:
-            return "NO ITEM NAME"
+            if item_name_bs4 is not None:
+                item_name = item_name_bs4.text
+                print(f"item_name: {item_name}")
+                return item_name
+            else:
+                return "NO ITEM NAME"
+        except:
+            # 要素がない場合の処理（※正確にはtryの内容を実行してエラーが起こる場合の処理）
+            print("ページを名取得できませんでした。")
+            
 
 class SeleniumIchibaScraper:
     '''
@@ -75,24 +86,35 @@ class SeleniumIchibaScraper:
         '''
 
         # itemにhtml要素を読み込み、個数が１以上であれば売切れでないと判断
-        item = self.driver.find_element_by_xpath(self.target_html_tag)
-        if item == None:
-            item_value = 0
-            return True # 売り切れ
-        else:
-            item_value = item.get_attribute('value')
-            return False # 在庫あり
+        try:
+            # 要素がある場合の処理
+            item = self.driver.find_element_by_xpath(self.target_html_tag)
+            if item == None:
+                item_value = 0
+                return True # 売り切れ
+            else:
+                item_value = item.get_attribute('value')
+                return False # 在庫あり
+        except:
+            # 要素がない場合の処理（※正確にはtryの内容を実行してエラーが起こる場合の処理）
+            print('個数のinput要素を取得できませんでした。')
 
 
     def get_item_name(self) -> str:
         '''
         商品名をページ上から取得してくる
         '''
-        item_name_bs4 = self.driver.find_element_by_xpath(self.item_name_html_tag)
 
-        if item_name_bs4 is not None:
-            item_name = item_name_bs4.text
-            print(f"item_name: {item_name}")
-            return item_name
-        else:
-            return "NO ITEM NAME"
+        try:
+            # 要素がある場合の処理
+            item_name_bs4 = self.driver.find_element_by_xpath(self.item_name_html_tag)
+        
+            if item_name_bs4 is not None:
+                item_name = item_name_bs4.text
+                print(f"item_name: {item_name}")
+                return item_name
+            else:
+                return "NO ITEM NAME"
+        except:
+            # 要素がない場合の処理（※正確にはtryの内容を実行してエラーが起こる場合の処理）
+            print('商品名を取得できませんでした。')
