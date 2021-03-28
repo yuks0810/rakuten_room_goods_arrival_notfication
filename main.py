@@ -112,7 +112,7 @@ def GetRandomStr(num):
     return ''.join([random.choice(dat) for i in range(num)])
 
 
-def main(event, context):
+def lambda_handler(event, context):
     '''
     メイン関数
     event, contextは "GCP cloud Function" で動かすのに必要な引数
