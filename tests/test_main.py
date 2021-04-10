@@ -22,3 +22,15 @@ def test_access_to_google_spread():
     worksheet_type = "<class 'gspread.models.Worksheet'>"
     worksheet = str(type(main.access_to_google_spread()))
     assert worksheet == worksheet_type
+
+
+def test_get_current_date():
+    '''
+    現在時刻を日本時間で取得できるかテスト
+    '''
+
+
+def test_tweetable():
+    '''
+    tweet可能状況をテスト
+    '''
