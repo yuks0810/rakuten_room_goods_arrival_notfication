@@ -2,22 +2,21 @@ import gspread, json, random, string
 import tweepy
 from datetime import datetime as dt, timedelta, timezone
 import datetime
-import settings # dotenv
+# import settings # dotenv
 import cells_to_arry
 
 from SeleniumDir.website_scraper_selenium import SeleniumRakutenBooksScraper, SeleniumIchibaScraper
-
-# Chrome Driverの最新を自動で更新する
-import webdriver_installer
 
 # Chrome Driverのために必要
 import chromedriver_binary
 from selenium.webdriver.chrome.options import Options # chromeをヘッドレスモードで実行するときのオプションのために必要
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
 
 # ServiceAccountCredentials：Googleの各サービスへアクセスできるservice変数を生成します。
 from oauth2client.service_account import ServiceAccountCredentials
+
+# Chrome Driverの最新を自動で更新する
+# from webdriver_manager.chrome import ChromeDriverManager
 
 scope = ['https://spreadsheets.google.com/feeds',
         'https://www.googleapis.com/auth/drive']
@@ -36,17 +35,32 @@ gc = gspread.authorize(credentials)
 SPREADSHEET_KEY = '1rgswOPcI7SHKo3KIKokg9-Pv67YcMitZfTXYEH1ClZ4'
 
 def auto_renew_chrome_driver():
-        '''
-        Chrome Driverの自動更新を実行
-        '''
+    '''
+    Chrome Driverの自動更新を実行
+    '''
 
-        # ヘッドレス起動のためのオプションを用意
-        option = Options()                          
-        option.add_argument('--headless')   
+    # ヘッドレス起動のためのオプションを用意
+    option = Options()                          
+    option.add_argument('--headless')   
 
-        # Chrome Driver
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=option)
-        return driver
+    # Chrome Driver
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=option)
+    return driver
+
+
+def set_up_chrome_driver():
+    '''
+    Lambdaで動作するようにChrome Driver設定
+    '''
+    options = webdriver.ChromeOptions()
+    options.binary_location = "./bin/headless-chromium"
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--single-process")
+    options.add_argument('--disable-dev-shm-usage')
+
+    driver = webdriver.Chrome(executable_path="./bin/chromedriver", chrome_options=options)
+    return driver
 
 
 def access_to_google_spread():
@@ -117,7 +131,10 @@ def lambda_handler(event, context):
     メイン関数
     event, contextは "GCP cloud Function" で動かすのに必要な引数
     '''
-    driver = auto_renew_chrome_driver()
+    print('event: {}'.format(event))
+    print('context: {}'.format(context))
+    
+    driver = set_up_chrome_driver()
     
     # google spread sheetに接続
     print('==========商品情報取得==========')
@@ -203,5 +220,9 @@ def lambda_handler(event, context):
     # スプレッドシートを更新
     worksheet.update_cells(item_index1d)
 
-# ローカル環境テスト実行用
-# main(event='a', context='a')
+    return {
+        'status_code': 200
+        }
+
+if __name__ == '__main__':
+    print(lambda_handler(event=None, context=None))
