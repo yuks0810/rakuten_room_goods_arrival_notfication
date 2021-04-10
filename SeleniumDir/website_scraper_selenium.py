@@ -1,5 +1,5 @@
 import time
-
+from selenium.common.exceptions import NoSuchElementException
 
 
 class SeleniumRakutenBooksScraper:
@@ -12,7 +12,7 @@ class SeleniumRakutenBooksScraper:
         self.item_name_html_tag = '//*[@id="productTitle"]/h1'
 
         self.item_url = item_url
-        
+
         # Chrome Driver
         self.driver = driver
         self.driver.get(item_url)
@@ -26,7 +26,12 @@ class SeleniumRakutenBooksScraper:
         '''
 
         # itemにhtml要素を読み込み、個数が１以上であれば売切れでないと判断
-        item = self.driver.find_element_by_css_selector(self.target_html_tag)
+        try:
+            item = self.driver.find_element_by_css_selector(self.target_html_tag)
+        except NoSuchElementException as e:
+            print(e)
+            item = None
+
         if item == None:
             item_value = 0
             return True # 売り切れ
@@ -39,7 +44,11 @@ class SeleniumRakutenBooksScraper:
         '''
         商品名をページ上から取得してくる
         '''
-        item_name_bs4 = self.driver.find_element_by_xpath(self.item_name_html_tag)
+        try:
+            item_name_bs4 = self.driver.find_element_by_xpath(self.item_name_html_tag)
+        except NoSuchElementException as e:
+            print(e)
+            item_name_bs4 = None
 
         if item_name_bs4 is not None:
             item_name = item_name_bs4.text
@@ -75,7 +84,12 @@ class SeleniumIchibaScraper:
         '''
 
         # itemにhtml要素を読み込み、個数が１以上であれば売切れでないと判断
-        item = self.driver.find_element_by_xpath(self.target_html_tag)
+        try:
+            item = self.driver.find_element_by_xpath(self.target_html_tag)
+        except NoSuchElementException as e:
+            print(e)
+            item = None
+        
         if item == None:
             item_value = 0
             return True # 売り切れ
@@ -88,7 +102,11 @@ class SeleniumIchibaScraper:
         '''
         商品名をページ上から取得してくる
         '''
-        item_name_bs4 = self.driver.find_element_by_xpath(self.item_name_html_tag)
+        try:
+            item_name_bs4 = self.driver.find_element_by_xpath(self.item_name_html_tag)
+        except NoSuchElementException as e:
+            print(e)
+            item_name_bs4 = None
 
         if item_name_bs4 is not None:
             item_name = item_name_bs4.text
