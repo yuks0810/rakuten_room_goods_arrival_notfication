@@ -1,6 +1,7 @@
 import urllib.request
 import requests
 from bs4 import BeautifulSoup
+from selenium.common.exceptions import NoSuchElementException
 
 class RakutenBooksScraper:
 
@@ -22,7 +23,12 @@ class RakutenBooksScraper:
         '''
 
         # itemにhtml要素を読み込み、個数が１以上であれば売切れでないと判断
-        item = self.soup.select_one(self.target_html_tag)
+        try:
+            item = self.soup.select_one(self.target_html_tag)
+        except NoSuchElementException as e:
+            print(e)
+            item = None
+
         if item == None:
             item_value = 0
             return True # 売り切れ
@@ -61,7 +67,12 @@ class RakutenIchibaScraper():
         '''
 
         # itemにhtml要素を読み込み、個数が１以上であれば売切れでないと判断
-        item = self.soup.select_one(self.target_html_tag)
+        try:
+            item = self.soup.select_one(self.target_html_tag)
+        except NoSuchElementException as e:
+            print(e)
+            item = None
+
         if item == None:
             item_value = 0
             return True # 売り切れ
@@ -74,7 +85,11 @@ class RakutenIchibaScraper():
         '''
         商品名をページ上から取得してくる
         '''
-        item_name_bs4 = self.soup.select_one("[class='item_name']")
+        try:
+            item_name_bs4 = self.soup.select_one("[class='item_name']")
+        except NoSuchElementException as e:
+            print(e)
+            item_name_bs4 = None
     
         if item_name_bs4 is not None:
             item_name = item_name_bs4.b.text
