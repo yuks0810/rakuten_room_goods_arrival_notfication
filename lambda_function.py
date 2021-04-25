@@ -1,8 +1,11 @@
-import gspread, json, random, string
+import gspread
+import json
+import random
+import string
 import tweepy
 from datetime import datetime as dt, timedelta, timezone
 import datetime
-import settings # dotenv
+import settings  # dotenv
 import cells_to_arry
 
 # スクレイピング
@@ -10,7 +13,8 @@ from SeleniumDir.SeleniumParent import SeleniumParent
 
 # Chrome Driverのために必要
 import chromedriver_binary
-from selenium.webdriver.chrome.options import Options # chromeをヘッドレスモードで実行するときのオプションのために必要
+# chromeをヘッドレスモードで実行するときのオプションのために必要
+from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 
 # ServiceAccountCredentials：Googleの各サービスへアクセスできるservice変数を生成します。
@@ -21,7 +25,7 @@ with open('config.yml', 'r') as yml:
     config = yaml.safe_load(yml)
 
 scope = ['https://spreadsheets.google.com/feeds',
-        'https://www.googleapis.com/auth/drive']
+         'https://www.googleapis.com/auth/drive']
 
 JST = timezone(timedelta(hours=+9), 'JST')
 
@@ -42,8 +46,8 @@ def auto_renew_chrome_driver():
     from webdriver_manager.chrome import ChromeDriverManager
 
     # ヘッドレス起動のためのオプションを用意
-    option = Options()                          
-    option.add_argument('--headless')   
+    option = Options()
+    option.add_argument('--headless')
 
     # Chrome Driver
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=option)
@@ -61,7 +65,8 @@ def set_up_chrome_driver():
     options.add_argument("--single-process")
     options.add_argument('--disable-dev-shm-usage')
 
-    driver = webdriver.Chrome(executable_path="./bin/chromedriver", chrome_options=options)
+    driver = webdriver.Chrome(
+        executable_path="./bin/chromedriver", chrome_options=options)
     return driver
 
 
@@ -80,14 +85,14 @@ def get_current_date():
     # 日本時間で現在時間を取得する
     timenow = dt.now(JST)
     current_time_in_datetime = datetime.datetime(
-                                year=timenow.year, 
-                                month=timenow.month, 
-                                day=timenow.day, 
-                                hour=timenow.hour, 
-                                minute=timenow.minute, 
-                                second=timenow.second
-                                )
-                                
+        year=timenow.year,
+        month=timenow.month,
+        day=timenow.day,
+        hour=timenow.hour,
+        minute=timenow.minute,
+        second=timenow.second
+    )
+
     return current_time_in_datetime
 
 
@@ -99,7 +104,8 @@ def tweetable(last_tweet_date):
         return True
     last_tweet_date = dt.strptime(last_tweet_date, '%Y/%m/%d %H:%M:%S')
     datetime_now = get_current_date()
-    datetime_last_tweet_date = datetime.datetime(year=last_tweet_date.year, month=last_tweet_date.month, day=last_tweet_date.day, hour=last_tweet_date.hour, minute=last_tweet_date.minute, second=last_tweet_date.second)
+    datetime_last_tweet_date = datetime.datetime(year=last_tweet_date.year, month=last_tweet_date.month, day=last_tweet_date.day,
+                                                 hour=last_tweet_date.hour, minute=last_tweet_date.minute, second=last_tweet_date.second)
 
     # スプレッドシートに記載されている時間と、JSTの現在時刻を比較
     timegap = datetime_now - datetime_last_tweet_date
@@ -128,7 +134,7 @@ def lambda_handler(event, context, test_mode=False):
     '''
     print('event: {}'.format(event))
     print('context: {}'.format(context))
-    
+
     if test_mode:
         # ローカル環境用
         driver = auto_renew_chrome_driver()
@@ -161,11 +167,11 @@ def lambda_handler(event, context, test_mode=False):
     for i, item_row in enumerate(item_index2d):
         if item_row[0].value == "" or tweetable(item_row[4].value) is False:
             continue
-        
+
         item_url = item_row[0].value
         rakute_room_url = item_row[1].value
         rakuten_affiliate_url = item_row[2].value
-        
+
         if "books.rakuten.co.jp" in item_url:
             # 楽天ブックスの場合
             print('=====楽天ブックススクレイピング start=====')
@@ -173,7 +179,7 @@ def lambda_handler(event, context, test_mode=False):
                 item_url=item_url,
                 driver=driver,
                 target_html_xpath=config["rakuten_books"]["target_xpath"]
-                )
+            )
             sold_out = rakute_bools_scraper.is_sold_out()
             print('=====楽天ブックススクレイピング end=====')
         elif "item.rakuten.co.jp" in item_url:
@@ -183,7 +189,7 @@ def lambda_handler(event, context, test_mode=False):
                 item_url=item_url,
                 driver=driver,
                 target_html_xpath=config["rakuten_ichiba"]["target_xpath"]
-                )
+            )
             sold_out = rakute_ichiba_scraper.is_sold_out()
             print('=====楽天市場スクレイピング end=====')
         else:
@@ -198,8 +204,8 @@ def lambda_handler(event, context, test_mode=False):
                 rakute_room_url=rakute_room_url,
                 rand_str=rand_str,
                 rakuten_affiliate_url=rakuten_affiliate_url
-                )
-            
+            )
+
             print(f"tweet可能？：{tweetable(item_row[4].value)}")
             if tweetable(item_row[4].value):
                 tdatetime = get_current_date()
@@ -213,23 +219,24 @@ def lambda_handler(event, context, test_mode=False):
                 api = tweepy.API(auth)
                 api.update_status(msg)
                 print('=====SpreadSheetに書き込みを行いました=====')
-                                
+
         if sold_out is True:
             msg = '{rakute_room_url}'.format(
                 rakute_room_url=rakute_room_url
-                )
+            )
             item_row[5].value = "可能"
 
     # 二次元になっているリストを１次元に直す
     # 二次元だと書き込めない
     item_index1d = cells_to_arry.cellsto1darray(item_index2d)
-    
+
     # スプレッドシートを更新
     worksheet.update_cells(item_index1d)
 
     return {
         'status_code': 200
-        }
+    }
+
 
 if __name__ == '__main__':
     # ローカル環境で実行するときはtest_mode=Trueにする
