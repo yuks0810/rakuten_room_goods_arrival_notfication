@@ -240,4 +240,4 @@ def lambda_handler(event, context, test_mode=False):
 
 if __name__ == '__main__':
     # ローカル環境で実行するときはtest_mode=Trueにする
-    print(lambda_handler(event=None, context=None, test_mode=True))
+    print(lambda_handler(event=None, context=None, test_mode=False))
