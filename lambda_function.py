@@ -2,10 +2,11 @@ import gspread, json, random, string
 import tweepy
 from datetime import datetime as dt, timedelta, timezone
 import datetime
-# import settings # dotenv
+import settings # dotenv
 import cells_to_arry
 
-from SeleniumDir.website_scraper_selenium import SeleniumRakutenBooksScraper, SeleniumIchibaScraper
+# スクレイピング
+from SeleniumDir.SeleniumParent import SeleniumParent
 
 # Chrome Driverのために必要
 import chromedriver_binary
@@ -15,8 +16,9 @@ from selenium import webdriver
 # ServiceAccountCredentials：Googleの各サービスへアクセスできるservice変数を生成します。
 from oauth2client.service_account import ServiceAccountCredentials
 
-# Chrome Driverの最新を自動で更新する
-# from webdriver_manager.chrome import ChromeDriverManager
+import yaml
+with open('config.yml', 'r') as yml:
+    config = yaml.safe_load(yml)
 
 scope = ['https://spreadsheets.google.com/feeds',
         'https://www.googleapis.com/auth/drive']
@@ -31,13 +33,13 @@ credentials = ServiceAccountCredentials.from_json_keyfile_name(
 # OAuth2の資格情報を使用してGoogle APIにログインします。
 gc = gspread.authorize(credentials)
 
-# 共有設定したスプレッドシートキーを変数[SPREADSHEET_KEY]に格納する。
-SPREADSHEET_KEY = '1rgswOPcI7SHKo3KIKokg9-Pv67YcMitZfTXYEH1ClZ4'
 
 def auto_renew_chrome_driver():
     '''
     Chrome Driverの自動更新を実行
     '''
+    # Chrome Driverの最新を自動で更新する（ローカル環境用）
+    from webdriver_manager.chrome import ChromeDriverManager
 
     # ヘッドレス起動のためのオプションを用意
     option = Options()                          
@@ -68,7 +70,7 @@ def access_to_google_spread():
     google spread sheetにアクセスする
     '''
     # 共有設定したスプレッドシートのシート1を開く
-    workbook = gc.open_by_key(SPREADSHEET_KEY)
+    workbook = gc.open_by_key(config['spreadsheet_key'])
     worksheet = workbook.worksheet('通知testシート')
 
     return worksheet
@@ -93,18 +95,14 @@ def tweetable(last_tweet_date):
     '''
     30分以内にtweetしたかどうかを判断する
     '''
-
     if not last_tweet_date:
         return True
-
     last_tweet_date = dt.strptime(last_tweet_date, '%Y/%m/%d %H:%M:%S')
-
     datetime_now = get_current_date()
     datetime_last_tweet_date = datetime.datetime(year=last_tweet_date.year, month=last_tweet_date.month, day=last_tweet_date.day, hour=last_tweet_date.hour, minute=last_tweet_date.minute, second=last_tweet_date.second)
 
     # スプレッドシートに記載されている時間と、JSTの現在時刻を比較
     timegap = datetime_now - datetime_last_tweet_date
-
     # 30分以上の差があればTrueとする
     if timegap.seconds > 1800:
         return True
@@ -113,39 +111,39 @@ def tweetable(last_tweet_date):
 
 
 def GetRandomStr(num):
-
     '''
     twitterで同じ文章を連投できないのでランダムな２文字の文字列を
     文章の末尾に追加してエラーを回避するためのもの
     '''
-
     # 英数字をすべて取得
     dat = string.digits + string.ascii_lowercase + string.ascii_uppercase
-
     # 英数字からランダムに取得
     return ''.join([random.choice(dat) for i in range(num)])
 
 
-def lambda_handler(event, context):
+def lambda_handler(event, context, test_mode=False):
     '''
     メイン関数
-    event, contextは "GCP cloud Function" で動かすのに必要な引数
+    event, contextは "AWS Lambda" で動かすのに必要な引数
     '''
     print('event: {}'.format(event))
     print('context: {}'.format(context))
     
-    driver = set_up_chrome_driver()
-    
+    if test_mode:
+        # ローカル環境用
+        driver = auto_renew_chrome_driver()
+    else:
+        # lambda環境用
+        driver = set_up_chrome_driver()
+
     # google spread sheetに接続
-    print('==========商品情報取得==========')
+    print('==========spread sheet接続 start==========')
     worksheet = access_to_google_spread()
-    item_url = worksheet.acell('A2').value
-    rakute_room_url = worksheet.acell('B2').value
-    print('==========商品情報取得 end==========')
-    
     # 商品の一覧の範囲を取得
     item_index = worksheet.range('A2:G10')
+    # ２次元配列にした方が操作しやすいため、item_indexを２次元配列に変換
     item_index2d = cells_to_arry.cellsto2darray(item_index, 7)
+    print('==========spread sheet接続 end==========')
 
     # テスト用（.envから読み取っている）
     # API_KEY = settings.API_KEY
@@ -165,35 +163,42 @@ def lambda_handler(event, context):
             continue
         
         item_url = item_row[0].value
+        rakute_room_url = item_row[1].value
+        rakuten_affiliate_url = item_row[2].value
         
         if "books.rakuten.co.jp" in item_url:
             # 楽天ブックスの場合
             print('=====楽天ブックススクレイピング start=====')
-            rakute_bools_scraper = SeleniumRakutenBooksScraper(item_url=item_url, driver=driver)
+            rakute_bools_scraper = SeleniumParent(
+                item_url=item_url,
+                driver=driver,
+                target_html_xpath=config["rakuten_books"]["target_xpath"]
+                )
             sold_out = rakute_bools_scraper.is_sold_out()
-            item_name = rakute_bools_scraper.get_item_name()
             print('=====楽天ブックススクレイピング end=====')
-
         elif "item.rakuten.co.jp" in item_url:
             # 楽天市場の場合
             print('=====楽天市場スクレイピング start=====')
-            rakute_ichiba_scraper = SeleniumIchibaScraper(item_url=item_url, driver=driver)
+            rakute_ichiba_scraper = SeleniumParent(
+                item_url=item_url,
+                driver=driver,
+                target_html_xpath=config["rakuten_ichiba"]["target_xpath"]
+                )
             sold_out = rakute_ichiba_scraper.is_sold_out()
-            item_name = rakute_ichiba_scraper.get_item_name()
             print('=====楽天市場スクレイピング end=====')
         else:
             continue
-
-        rakute_room_url = item_row[1].value
-        rakute_room_url2 = item_row[2].value
-        tweetable_words_length = item_row[6]
 
         if sold_out is False:
             print("=====在庫あり=====")
             rand_str = GetRandomStr(2)
 
-            # twitterに投稿する内容
-            msg = '{item_name}{rand_str}\r\n急ぎの方こちら↓\r\n{rakute_room_url2}\r\n{rakute_room_url}'.format(item_name=item_name[:90], rakute_room_url=rakute_room_url, rand_str=rand_str, rakute_room_url2=rakute_room_url2)
+            # twitterに投稿する内容を作成
+            msg = '{rand_str}\r\n急ぎの方こちら↓\r\n{rakuten_affiliate_url}\r\n{rakute_room_url}'.format(
+                rakute_room_url=rakute_room_url,
+                rand_str=rand_str,
+                rakuten_affiliate_url=rakuten_affiliate_url
+                )
             
             print(f"tweet可能？：{tweetable(item_row[4].value)}")
             if tweetable(item_row[4].value):
@@ -210,7 +215,9 @@ def lambda_handler(event, context):
                 print('=====SpreadSheetに書き込みを行いました=====')
                                 
         if sold_out is True:
-            msg = '{item_name} {rakute_room_url}'.format(item_name=item_name, rakute_room_url=rakute_room_url)
+            msg = '{rakute_room_url}'.format(
+                rakute_room_url=rakute_room_url
+                )
             item_row[5].value = "可能"
 
     # 二次元になっているリストを１次元に直す
@@ -225,4 +232,5 @@ def lambda_handler(event, context):
         }
 
 if __name__ == '__main__':
-    print(lambda_handler(event=None, context=None))
+    # ローカル環境で実行するときはtest_mode=Trueにする
+    print(lambda_handler(event=None, context=None, test_mode=True))
