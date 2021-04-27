@@ -5,7 +5,7 @@ import string
 import tweepy
 from datetime import datetime as dt, timedelta, timezone
 import datetime
-import settings  # dotenv
+# import settings  # dotenv
 import cells_to_arry
 
 # スクレイピング
