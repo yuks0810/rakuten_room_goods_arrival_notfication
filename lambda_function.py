@@ -1,5 +1,4 @@
 import gspread
-import json
 import random
 import string
 import tweepy
@@ -12,7 +11,7 @@ import cells_to_arry
 from SeleniumDir.SeleniumParent import SeleniumParent
 
 # Chrome Driverのために必要
-import chromedriver_binary
+# import chromedriver_binary
 # chromeをヘッドレスモードで実行するときのオプションのために必要
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
@@ -104,8 +103,14 @@ def tweetable(last_tweet_date):
         return True
     last_tweet_date = dt.strptime(last_tweet_date, '%Y/%m/%d %H:%M:%S')
     datetime_now = get_current_date()
-    datetime_last_tweet_date = datetime.datetime(year=last_tweet_date.year, month=last_tweet_date.month, day=last_tweet_date.day,
-                                                 hour=last_tweet_date.hour, minute=last_tweet_date.minute, second=last_tweet_date.second)
+    datetime_last_tweet_date = datetime.datetime(
+        year=last_tweet_date.year,
+        month=last_tweet_date.month,
+        day=last_tweet_date.day,
+        hour=last_tweet_date.hour,
+        minute=last_tweet_date.minute,
+        second=last_tweet_date.second
+    )
 
     # スプレッドシートに記載されている時間と、JSTの現在時刻を比較
     timegap = datetime_now - datetime_last_tweet_date
