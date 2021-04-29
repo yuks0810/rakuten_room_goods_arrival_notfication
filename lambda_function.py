@@ -5,13 +5,14 @@ import tweepy
 from datetime import datetime as dt, timedelta, timezone
 import datetime
 # import settings  # dotenv
-import cells_to_arry
+from src import cells_to_arry
 
 # スクレイピング
-from SeleniumDir.SeleniumParent import SeleniumParent
+from src.SeleniumDir.SeleniumParent import SeleniumParent
 
 # Chrome Driverのために必要
-# import chromedriver_binary
+import chromedriver_binary
+
 # chromeをヘッドレスモードで実行するときのオプションのために必要
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
@@ -20,7 +21,7 @@ from selenium import webdriver
 from oauth2client.service_account import ServiceAccountCredentials
 
 import yaml
-with open('config.yml', 'r') as yml:
+with open('src/config.yml', 'r') as yml:
     config = yaml.safe_load(yml)
 
 scope = ['https://spreadsheets.google.com/feeds',
@@ -31,7 +32,7 @@ JST = timezone(timedelta(hours=+9), 'JST')
 # 認証情報設定
 # ダウンロードしたjsonファイル名をクレデンシャル変数に設定（秘密鍵、Pythonファイルから読み込みしやすい位置に置く）
 credentials = ServiceAccountCredentials.from_json_keyfile_name(
-    'expanded-bebop-246202-a2de23a0eef9.json', scope)
+    'src/expanded-bebop-246202-a2de23a0eef9.json', scope)
 
 # OAuth2の資格情報を使用してGoogle APIにログインします。
 gc = gspread.authorize(credentials)
@@ -245,4 +246,4 @@ def lambda_handler(event, context, test_mode=False):
 
 if __name__ == '__main__':
     # ローカル環境で実行するときはtest_mode=Trueにする
-    print(lambda_handler(event=None, context=None, test_mode=False))
+    print(lambda_handler(event=None, context=None, test_mode=True))
