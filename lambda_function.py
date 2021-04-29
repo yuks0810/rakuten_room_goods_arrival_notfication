@@ -11,7 +11,7 @@ from src import cells_to_arry
 from src.SeleniumDir.SeleniumParent import SeleniumParent
 
 # Chrome Driverのために必要
-import chromedriver_binary
+# import chromedriver_binary
 
 # chromeをヘッドレスモードで実行するときのオプションのために必要
 from selenium.webdriver.chrome.options import Options
@@ -246,4 +246,4 @@ def lambda_handler(event, context, test_mode=False):
 
 if __name__ == '__main__':
     # ローカル環境で実行するときはtest_mode=Trueにする
-    print(lambda_handler(event=None, context=None, test_mode=True))
+    print(lambda_handler(event=None, context=None, test_mode=False))
