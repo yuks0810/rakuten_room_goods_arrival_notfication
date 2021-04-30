@@ -1,0 +1,10 @@
+version: '3'
+services:
+  rakuten:
+    restart: always
+    build: .
+    container_name: 'rakuten'
+    working_dir: '/root/'
+    tty: true
+    volumes:
+      - ./:/root/
