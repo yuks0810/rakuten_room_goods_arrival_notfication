@@ -145,3 +145,8 @@ upload.zip
 .local
 .bash_history
 .python_history
+
+.pki/
+.wdm/
+.wget-hsts
+get-pip.py

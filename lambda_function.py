@@ -46,11 +46,14 @@ def auto_renew_chrome_driver():
     from webdriver_manager.chrome import ChromeDriverManager
 
     # ヘッドレス起動のためのオプションを用意
-    option = Options()
-    option.add_argument('--headless')
+    options = Options()
+    options.add_argument('--headless')
+    options.add_argument("--no-sandbox")
+    options.add_argument("--single-process")
+    options.add_argument('--disable-dev-shm-usage')
 
     # Chrome Driver
-    driver = webdriver.Chrome(ChromeDriverManager().install(), options=option)
+    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     return driver
 
 
