@@ -1,10 +1,12 @@
 version: '3'
 services:
   rakuten:
+    build:
+      context: .
     restart: always
-    build: .
     container_name: 'rakuten'
-    working_dir: '/root/'
+    working_dir: '/webapp'
+    command: bash -C "pip install pipenv && pipenv lock -r > requirements.txt && pip install -r requirements.txt"
     tty: true
     volumes:
-      - ./:/root/
+      - .:/webapp
