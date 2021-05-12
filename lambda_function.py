@@ -252,7 +252,8 @@ if __name__ == '__main__':
     # 引数を設定
     parser = argparse.ArgumentParser()
     parser.add_argument('--test_mode', action='store_true')
-    args = parser.parse_args() 
+    args = parser.parse_args()
 
     # ローカル環境で実行するときはtest_mode=Trueにする
-    print(lambda_handler(event=None, context=None, test_mode=args.test_mode), type=bool)
+    print(lambda_handler(event=None, context=None,
+          test_mode=args.test_mode), type=bool)

@@ -26,7 +26,7 @@ RUN cd /opt/chrome/ \
     && unzip chromedriver_linux64.zip
 
 RUN pip install pipenv
-RUN pipenv lock -r > requirements.txt
+# RUN pipenv lock -r > requirements.txt
 RUN pip install -r requirements.txt
 RUN pip install webdriver-manager
 
