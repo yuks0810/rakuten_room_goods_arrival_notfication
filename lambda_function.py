@@ -256,4 +256,4 @@ if __name__ == '__main__':
 
     # ローカル環境で実行するときはtest_mode=Trueにする
     print(lambda_handler(event=None, context=None,
-          test_mode=args.test_mode), type=bool)
+          test_mode=args.test_mode))
