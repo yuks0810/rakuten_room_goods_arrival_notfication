@@ -13,7 +13,9 @@ class SeleniumParent:
         # Chrome Driver
         self.driver = driver
         self.driver.get(item_url)
-        time.sleep(2)
+        self.driver.implicitly_wait(10)
+        self.driver.set_window_size('1200', '1000')
+        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
     def is_sold_out(self) -> bool:
         '''

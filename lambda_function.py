@@ -6,7 +6,7 @@ import tweepy
 from datetime import datetime as dt, timedelta, timezone
 import datetime
 # import settings  # dotenv
-from src import cells_to_arry
+from src.GspreadControll import cells_to_arry
 
 # スクレイピング
 from src.SeleniumDir.SeleniumParent import SeleniumParent
@@ -22,7 +22,7 @@ from selenium import webdriver
 from oauth2client.service_account import ServiceAccountCredentials
 
 import yaml
-with open('src/config.yml', 'r') as yml:
+with open('src/SeleniumDir/config.yml', 'r') as yml:
     config = yaml.safe_load(yml)
 
 scope = ['https://spreadsheets.google.com/feeds',
@@ -43,16 +43,17 @@ def auto_renew_chrome_driver():
     '''
     Chrome Driverの自動更新を実行
     '''
+    global driver
     # Chrome Driverの最新を自動で更新する（ローカル環境用）
     from webdriver_manager.chrome import ChromeDriverManager
-
+    
     # ヘッドレス起動のためのオプションを用意
     options = Options()
     options.add_argument('--headless')
-    options.add_argument("--no-sandbox")
-    options.add_argument("--single-process")
-    options.add_argument('--disable-dev-shm-usage')
-
+    options.add_argument('--disable-gpu')              # headlessモードで暫定的に必要なフラグ(そのうち不要になる)
+    options.add_argument('--disable-extensions')       # すべての拡張機能を無効にする。ユーザースクリプトも無効にする
+    options.add_argument('--start-maximized')          # 起動時にウィンドウを最大化する
+    options.add_argument('--disable-infobars')
     # Chrome Driver
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     return driver
@@ -65,9 +66,9 @@ def set_up_chrome_driver():
     options = webdriver.ChromeOptions()
     options.binary_location = "./bin/headless-chromium"
     options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--single-process")
-    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')              # headlessモードで暫定的に必要なフラグ(そのうち不要になる)
+    options.add_argument('--disable-extensions')       # すべての拡張機能を無効にする。ユーザースクリプトも無効にする
+    options.add_argument('--start-maximized')          # 起動時にウィンドウを最大化する
 
     driver = webdriver.Chrome(
         executable_path="./bin/chromedriver", chrome_options=options)
@@ -242,10 +243,8 @@ def lambda_handler(event, context, test_mode=False):
 
     # スプレッドシートを更新
     worksheet.update_cells(item_index1d)
-
-    return {
-        'status_code': 200
-    }
+    driver.quit()
+    return {'status_code': 200}
 
 
 if __name__ == '__main__':
@@ -255,5 +254,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # ローカル環境で実行するときはtest_mode=Trueにする
-    print(lambda_handler(event=None, context=None,
-          test_mode=args.test_mode))
+    print(lambda_handler(event=None, context=None, test_mode=args.test_mode))
