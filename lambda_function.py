@@ -52,6 +52,7 @@ def auto_renew_chrome_driver():
     options.add_argument("--no-sandbox")
     options.add_argument("--single-process")
     options.add_argument('--disable-dev-shm-usage')
+    options..add_argument('--new-window')
 
     # Chrome Driver
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
@@ -68,6 +69,8 @@ def set_up_chrome_driver():
     options.add_argument("--no-sandbox")
     options.add_argument("--single-process")
     options.add_argument('--disable-dev-shm-usage')
+    option.add_argument('--proxy-server=http://%s' % PROXY)
+    option.add_argument('--proxy-auth=%s' % PROXY_AUTH)
 
     driver = webdriver.Chrome(
         executable_path="./bin/chromedriver", chrome_options=options)
