@@ -50,10 +50,11 @@ def auto_renew_chrome_driver():
     # ヘッドレス起動のためのオプションを用意
     options = Options()
     options.add_argument('--headless')
-    options.add_argument('--disable-gpu')              # headlessモードで暫定的に必要なフラグ(そのうち不要になる)
-    options.add_argument('--disable-extensions')       # すべての拡張機能を無効にする。ユーザースクリプトも無効にする
-    options.add_argument('--start-maximized')          # 起動時にウィンドウを最大化する
-    options.add_argument('--disable-infobars')
+    options.add_argument("--no-sandbox")
+    options.add_argument("--single-process")
+    options.add_argument('--disable-dev-shm-usage')
+    options..add_argument('--new-window')
+
     # Chrome Driver
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
     return driver
@@ -66,9 +67,11 @@ def set_up_chrome_driver():
     options = webdriver.ChromeOptions()
     options.binary_location = "./bin/headless-chromium"
     options.add_argument("--headless")
-    options.add_argument('--disable-gpu')              # headlessモードで暫定的に必要なフラグ(そのうち不要になる)
-    options.add_argument('--disable-extensions')       # すべての拡張機能を無効にする。ユーザースクリプトも無効にする
-    options.add_argument('--start-maximized')          # 起動時にウィンドウを最大化する
+    options.add_argument("--no-sandbox")
+    options.add_argument("--single-process")
+    options.add_argument('--disable-dev-shm-usage')
+    option.add_argument('--proxy-server=http://%s' % PROXY)
+    option.add_argument('--proxy-auth=%s' % PROXY_AUTH)
 
     driver = webdriver.Chrome(
         executable_path="./bin/chromedriver", chrome_options=options)
