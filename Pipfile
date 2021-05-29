@@ -3,6 +3,11 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[scripts]
+lint = "flake8 --config ./setup.cfg --show-source src/"
+format = "autopep8 --global-config ./setup.cfg -ivr src/"
+format-check = "autopep8 --global-config ./setup.cfg --exit-code -dvr src/"
+
 [packages]
 requests = ">=2.22.0"
 beautifulsoup4 = ">=4.8.1"
@@ -12,8 +17,18 @@ python-twitter = "*"
 requests-oauthlib = "*"
 tweepy = "*"
 python-dotenv = "*"
+lxml = "*"
+selenium = "*"
+chromedriver-binary = "*"
+pyyaml = "*"
+importlib-metadata = "==2.1.1"
+webdriver-manager = "*"
 
 [dev-packages]
+pep8 = "*"
+autopep8 = "*"
+pycodestyle = "*"
+flake8 = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.6"
