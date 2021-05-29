@@ -1,0 +1,5 @@
+spreadsheet_key: '1rgswOPcI7SHKo3KIKokg9-Pv67YcMitZfTXYEH1ClZ4'
+rakuten_books:
+  target_xpath: '//*[@id="units"]'
+rakuten_ichiba:
+  target_xpath: '//*[@id="units"]'
