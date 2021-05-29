@@ -16,15 +16,6 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
     && python get-pip.py
 
-#install ChromeDriver
-ADD https://chromedriver.storage.googleapis.com/2.45/chromedriver_linux64.zip /opt/chrome/
-
-RUN pip install --upgrade pip \
-    && pip install --upgrade setuptools
-
-RUN cd /opt/chrome/ \
-    && unzip chromedriver_linux64.zip
-
 RUN pip install pipenv
 # RUN pipenv lock -r > requirements.txt
 RUN pip install -r requirements.txt
