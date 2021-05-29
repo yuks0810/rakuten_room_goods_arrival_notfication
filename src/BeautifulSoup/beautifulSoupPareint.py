@@ -11,7 +11,7 @@ class BeautifulSoupScrayping:
         self.target_css_selector = target_css_selector
 
         headers = {"User-Agent": "hoge"}
-        resp = requests.get(URL, timeout=1, headers=headers)
+        resp = requests.get(URL, timeout=20, headers=headers)
         r_text = resp.text
         self.b_soup = BeautifulSoup(r_text, 'html.parser')
 
@@ -26,7 +26,7 @@ class BeautifulSoupScrayping:
 
         if res["elm"] == None:
             # 売り切れ
-            print(f'{res["title"]} => 売り切れ')
+            print('売り切れ')
             return True
         else:
             print(f'{res["title"]} => 在庫あり')
