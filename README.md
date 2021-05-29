@@ -10,7 +10,7 @@ $ docker-compose up -d --build
 ### ローカルで作業するとき（log見れない）
 スクレイピングを実行
 ```
-$ docker-compose run rakuten python lambda_function.py --test_mode
+$ docker-compose run rakuten python lambda_function.py
 ```
 
 #### terminalに表示されるlogを見たいとき
