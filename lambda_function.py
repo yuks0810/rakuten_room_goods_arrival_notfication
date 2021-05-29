@@ -6,7 +6,7 @@ import tweepy
 from datetime import datetime as dt, timedelta, timezone
 import datetime
 # import settings  # dotenv
-from src import cells_to_arry
+from src.GspreadControll import cells_to_arry
 
 # スクレイピング
 from src.SeleniumDir.SeleniumParent import SeleniumParent
@@ -22,7 +22,7 @@ from selenium import webdriver
 from oauth2client.service_account import ServiceAccountCredentials
 
 import yaml
-with open('src/config.yml', 'r') as yml:
+with open('src/SeleniumDir/config.yml', 'r') as yml:
     config = yaml.safe_load(yml)
 
 scope = ['https://spreadsheets.google.com/feeds',
@@ -43,9 +43,10 @@ def auto_renew_chrome_driver():
     '''
     Chrome Driverの自動更新を実行
     '''
+    global driver
     # Chrome Driverの最新を自動で更新する（ローカル環境用）
     from webdriver_manager.chrome import ChromeDriverManager
-
+    
     # ヘッドレス起動のためのオプションを用意
     options = Options()
     options.add_argument('--headless')
@@ -245,10 +246,8 @@ def lambda_handler(event, context, test_mode=False):
 
     # スプレッドシートを更新
     worksheet.update_cells(item_index1d)
-
-    return {
-        'status_code': 200
-    }
+    driver.quit()
+    return {'status_code': 200}
 
 
 if __name__ == '__main__':
@@ -258,5 +257,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # ローカル環境で実行するときはtest_mode=Trueにする
-    print(lambda_handler(event=None, context=None,
-          test_mode=args.test_mode))
+    print(lambda_handler(event=None, context=None, test_mode=args.test_mode))

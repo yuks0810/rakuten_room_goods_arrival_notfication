@@ -22,6 +22,7 @@ selenium = "*"
 chromedriver-binary = "*"
 pyyaml = "*"
 importlib-metadata = "==2.1.1"
+webdriver-manager = "*"
 
 [dev-packages]
 pep8 = "*"
