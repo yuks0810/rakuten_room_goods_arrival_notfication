@@ -101,3 +101,17 @@ $ docker-compose exec rakuten bash
 # コンテナ内に入った後に下記を実行
 $ python lambda_function.py
 ```
+
+アプリが起動していない場合は
+
+```
+$ docker-compose up -d --build
+```
+を行なってから以下を確認する
+
+```
+$ docker ps
+
+CONTAINER ID   IMAGE                                            COMMAND                  CREATED        STATUS          PORTS     NAMES
+8e78758594a6   rakuten_room_goods_arrival_notfication_rakuten   "/bin/sh -c 'while :…"   26 hours ago   Up 47 seconds             rakuten
+```
