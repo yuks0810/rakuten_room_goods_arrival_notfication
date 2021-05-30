@@ -18,7 +18,7 @@ $ docker-compose run rakuten python lambda_function.py
 $ docker-compose exec rakuten bash
 
 # コンテナ内に入った後に下記を実行
-$ python lambda_function.py --test_mode
+$ python lambda_function.py
 ```
 
 ## 実行コマンド
@@ -69,4 +69,35 @@ incorrect number of argumentsroot@10d680bf8aa9:/webapp# autopep8 --global-config
 --->  Applying global fix for E265
 --->  3 issue(s) to fix {'E501': {258, 213}, 'W291': {255}}
 --->  1 issue(s) to fix {'E501': {213}}
+```
+
+## EC2での動かし方
+### 対象のインスタンス
+Name: rakute_scrayping
+インスタンスID: i-0be5be70f0ca22e21
+このインスタンスが停止している場合は、インスタンスを起動する。
+### EC2にssh接続する
+
+<バブリックIP>の部分はawsの対象のEC2をみて確認
+```
+# -iのあとのpath指定はrakuten_scrayping_sub.pemがある場所を指定する
+$ ssh -i ~/.ssh/rakuten_scrayping_sub.pem ec2-user@<バブリックIP>
+```
+### sshでEC2に接続したあと
+
+下記のコマンドを実行して、`rakuten_room_goods_arrival_notfication_rakuten`が出てくればアプリが起動しているということ
+```
+$ docker ps
+
+CONTAINER ID   IMAGE                                            COMMAND                  CREATED        STATUS          PORTS     NAMES
+8e78758594a6   rakuten_room_goods_arrival_notfication_rakuten   "/bin/sh -c 'while :…"   26 hours ago   Up 47 seconds             rakuten
+```
+
+アプリが起動している場合は、下記を実行
+そうすると、スクレイピングが実行される。
+```
+$ docker-compose exec rakuten bash
+
+# コンテナ内に入った後に下記を実行
+$ python lambda_function.py
 ```
