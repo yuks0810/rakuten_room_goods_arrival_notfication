@@ -139,7 +139,7 @@ def lambda_handler(event, context, test_mode=False):
             print('=====楽天ブックススクレイピング start=====')
             rakute_books_scraper = BeautifulSoupScrayping(
                 URL=item_url,
-                target_css_selector="button[class='new_addToCart_kobo']"
+                target_css_selector="input[id='units']"
             )
             sold_out = rakute_books_scraper.is_sold_out()
             print(sold_out)
