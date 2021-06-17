@@ -115,3 +115,21 @@ $ docker ps
 CONTAINER ID   IMAGE                                            COMMAND                  CREATED        STATUS          PORTS     NAMES
 8e78758594a6   rakuten_room_goods_arrival_notfication_rakuten   "/bin/sh -c 'while :…"   26 hours ago   Up 47 seconds             rakuten
 ```
+
+## DB
+
+メインのホストコンテナからターミナルで接続するときのコマンド
+```
+mysql -u root -p -h rakuten_db_mysql -P 3306 --protocol=tcp -D rakute_app_db
+```
+
+パスワードは `.env` ファイルに記載されている。
+
+### 接続情報
+
+```
+hostname: rakuten_db_mysql
+password: .envに記載
+user: root
+db: rakute_app_db
+```
