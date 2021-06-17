@@ -6,7 +6,7 @@ WORKDIR $APP_ROOT
 
 COPY . $APP_ROOT
 
-RUN apt-get update && apt-get install -y unzip
+RUN apt-get update && apt-get install -y unzip mariadb-client
 
 # pipインストール(最新版)
 RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \

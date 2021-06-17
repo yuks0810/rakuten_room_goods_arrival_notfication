@@ -10,3 +10,26 @@ services:
     tty: true
     volumes:
       - .:/webapp
+
+  mysql:
+    image: mysql:5.7
+    hostname: rakuten_db_mysql
+    restart: 'always'
+    env_file:
+      - .env
+    volumes:
+      - ./mysql/db:/docker-entrypoint-initdb.d
+      # 初期データを投入するSQLが格納されているdir
+      - ./db/mysql_init:/docker-entrypoint-initdb.d
+      # 永続化するときにマウントするdir
+      - ./db/mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: 'rakute_app_db'
+      TZ: "Asia/Tokyo"
+      BIND-ADDRESS: 0.0.0.0
+    expose:
+      - '3306'
+    ports:
+      - "3306:3306"
+    tty: true

@@ -152,3 +152,5 @@ upload.zip
 get-pip.py
 
 .devcontainer/
+
+db/*
