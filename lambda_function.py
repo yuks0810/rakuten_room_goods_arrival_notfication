@@ -1,4 +1,5 @@
 import argparse
+from os import curdir
 import gspread
 import random
 import string
@@ -8,6 +9,14 @@ import datetime
 # import settings  # dotenv
 from src.GspreadControll import cells_to_arry
 from src.BeautifulSoup.beautifulSoupPareint import BeautifulSoupScrayping
+
+from mysql.query import (
+    create_db_connection,
+    close_db_connections,
+    insert_into_products_table,
+    update_set_products_table,
+    select_from_products_table
+)
 
 
 # ServiceAccountCredentials：Googleの各サービスへアクセスできるservice変数を生成します。
@@ -29,6 +38,7 @@ credentials = ServiceAccountCredentials.from_json_keyfile_name(
 
 # OAuth2の資格情報を使用してGoogle APIにログインします。
 gc = gspread.authorize(credentials)
+
 
 def access_to_google_spread():
     '''
@@ -57,30 +67,39 @@ def get_current_date():
     return current_time_in_datetime
 
 
-def tweetable(last_tweet_date):
+def tweetable(rakuten_product_url):
     '''
-    30分以内にtweetしたかどうかを判断する
-    '''
-    if not last_tweet_date:
-        return True
-    last_tweet_date = dt.strptime(last_tweet_date, '%Y/%m/%d %H:%M:%S')
-    datetime_now = get_current_date()
-    datetime_last_tweet_date = datetime.datetime(
-        year=last_tweet_date.year,
-        month=last_tweet_date.month,
-        day=last_tweet_date.day,
-        hour=last_tweet_date.hour,
-        minute=last_tweet_date.minute,
-        second=last_tweet_date.second
-    )
+    30分以内にtweetしたかどうかを判断する。
+    rakute_urlでDBを検索して、
+    最後に通知した値を取得する
 
-    # スプレッドシートに記載されている時間と、JSTの現在時刻を比較
-    timegap = datetime_now - datetime_last_tweet_date
-    # 30分以上の差があればTrueとする
-    if timegap.seconds > 1800:
+    return:
+        - True -> ツイート可能
+        - False -> ツイート不可
+    '''
+    # 空白を削除
+    rakuten_product_url = rakuten_product_url.strip()
+    # DBから該当の楽天URLを持つデータを取得する
+    row = select_from_products_table(rakuten_product_url)
+    print(row)
+    # 現在時刻を取得
+    datetime_now = get_current_date()
+
+    if row == None:
+        # データがない場合は新規にデータを作成
+        insert_into_products_table(rakuten_product_url=rakuten_product_url, latest_notification_date=datetime_now)
         return True
     else:
-        return False
+        id = row[0]
+        latest_tweet_date = row[1]
+        timegap = datetime_now - latest_tweet_date
+        if timegap.seconds > 1800:
+            # 最後の通知から30分経過していたら、最終通知時間をUpdateして Trueを返す（Tweet可能）
+            update_set_products_table(rakuten_product_url)
+            return True
+        else:
+            # 30分経過していなかったら、Falseを返す。（Tweetできない）
+            return False
 
 
 def GetRandomStr(num):
@@ -102,6 +121,9 @@ def lambda_handler(event, context, test_mode=False):
     print('event: {}'.format(event))
     print('context: {}'.format(context))
 
+    # DBに接続
+    global conn, cur
+    conn, cur = create_db_connection()
 
     # google spread sheetに接続
     print('==========spread sheet接続 start==========')
@@ -125,8 +147,8 @@ def lambda_handler(event, context, test_mode=False):
     ACCESS_TOKEN_SECRET = str(api_key_worksheet.acell('B4').value.strip())
     print('==========twitter情報取得 end==========')
 
-    for i, item_row in enumerate(item_index2d):
-        if item_row[0].value == "" or tweetable(item_row[4].value) is False:
+    for item_row in item_index2d:
+        if item_row[0].value == "" or tweetable(item_row[0].value) is False:
             continue
 
         item_url = item_row[0].value
@@ -144,7 +166,8 @@ def lambda_handler(event, context, test_mode=False):
             sold_out = rakute_books_scraper.is_sold_out()
             print(sold_out)
             print('=====楽天ブックススクレイピング end=====')
-        elif "item.rakuten.co.jp" in item_url:
+
+        if "item.rakuten.co.jp" in item_url:
             # 楽天市場の場合
             print('=====楽天市場スクレイピング start=====')
             rakute_ichiba_scraper = BeautifulSoupScrayping(
@@ -153,8 +176,6 @@ def lambda_handler(event, context, test_mode=False):
             )
             sold_out = rakute_ichiba_scraper.is_sold_out()
             print('=====楽天市場スクレイピング end=====')
-        else:
-            continue
 
         if sold_out is False:
             print("=====在庫あり=====")
@@ -168,14 +189,14 @@ def lambda_handler(event, context, test_mode=False):
                 post_message=post_message
             )
 
-            print(f"tweet可能？：{tweetable(item_row[4].value)}")
-            if tweetable(item_row[4].value):
+            print(f"tweet可能？：{tweetable(item_row[0].value)}")
+            if tweetable(item_row[0].value):
                 tdatetime = get_current_date()
                 tstr = tdatetime.strftime('%Y/%m/%d %H:%M:%S')
                 item_row[4].value = tstr
                 item_row[5].value = "不可"
 
-                # ツイート
+                # ツイート実行
                 auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
                 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
                 api = tweepy.API(auth)
@@ -194,6 +215,10 @@ def lambda_handler(event, context, test_mode=False):
 
     # スプレッドシートを更新
     worksheet.update_cells(item_index1d)
+
+    # DBセッションを閉じる
+    close_db_connections()
+
     return {'status_code': 200}
 
 
