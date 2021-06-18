@@ -1,5 +1,4 @@
-<img src="https://img.shields.io/badge/-Python-F9DC3E.svg?logo=python&style=flat">
-<img src="https://img.shields.io/badge/-Amazon%20AWS-232F3E.svg?logo=amazon-aws&style=flat">
+<img src="https://img.shields.io/badge/-Python-F9DC3E.svg?logo=python&style=flat"> <img src="https://img.shields.io/badge/-Amazon%20AWS-232F3E.svg?logo=amazon-aws&style=flat"> <img src="https://img.shields.io/badge/-Docker-1488C6.svg?logo=docker&style=flat-square">
 
 # rakuten_room_goods_arrival_notfication
 <img src="https://img.shields.io/badge/ver.-v2.1.0-ff7964.svg?style=for-the-badge">
@@ -27,9 +26,7 @@ $ python lambda_function.py
 ```
 
 ## 実行コマンド
-<img src="https://img.shields.io/badge/kakakakakku-MustCheck-life-232f3e.svg?style=for-the-badge">
-
-
+<img src="https://img.shields.io/badge/MUST%20CHECK-Execution%20Commnands-3DBB3D.svg?logo=&style=flat-square">
 
 ## PR作成前
 静的解析を実行する
