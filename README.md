@@ -22,21 +22,6 @@ $ python lambda_function.py
 ```
 
 ## 実行コマンド
-### s3に上げるためのコマンド
-下記コマンド実行で upload.zipを作成する
-```
-$ docker-compose exec rakuten sh make_upload.sh
-```
-
-### docker環境破壊
-作業終了後は下記コマンド実行
-```
-$ docker-compose down --rmi all --volumes --remove-orphans
-```
-OR
-```
-$ docker system prune
-```
 
 ## PR作成前
 静的解析を実行する
@@ -132,4 +117,22 @@ hostname: rakuten_db_mysql
 password: .envに記載
 user: root
 db: rakute_app_db
+```
+
+## 過去ログ
+
+### s3に上げるためのコマンド
+下記コマンド実行で upload.zipを作成する
+```
+$ docker-compose exec rakuten sh make_upload.sh
+```
+
+### docker環境破壊
+作業終了後は下記コマンド実行
+```
+$ docker-compose down --rmi all --volumes --remove-orphans
+```
+OR
+```
+$ docker system prune
 ```

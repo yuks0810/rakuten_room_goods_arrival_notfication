@@ -94,23 +94,11 @@ def tweetable(rakuten_product_url):
         latest_tweet_date = row[1]
         timegap = datetime_now - latest_tweet_date
         if timegap.seconds > 1800:
-            # 最後の通知から30分経過していたら、最終通知時間をUpdateして Trueを返す（Tweet可能）
-            update_set_products_table(rakuten_product_url)
+            # 最後の通知から30分経過していたら、最終通知時間をUpdateして Trueを返す（Tweet可能）dddd
             return True
         else:
             # 30分経過していなかったら、Falseを返す。（Tweetできない）
             return False
-
-
-def GetRandomStr(num):
-    '''
-    twitterで同じ文章を連投できないのでランダムな２文字の文字列を
-    文章の末尾に追加してエラーを回避するためのもの
-    '''
-    # 英数字をすべて取得
-    dat = string.digits + string.ascii_lowercase + string.ascii_uppercase
-    # 英数字からランダムに取得
-    return ''.join([random.choice(dat) for i in range(num)])
 
 
 def lambda_handler(event, context, test_mode=False):
@@ -151,27 +139,27 @@ def lambda_handler(event, context, test_mode=False):
         if item_row[0].value == "" or tweetable(item_row[0].value) is False:
             continue
 
-        item_url = item_row[0].value
-        rakute_room_url = item_row[1].value
-        rakuten_affiliate_url = item_row[2].value
+        rakuten_product_url = str(item_row[0].value).strip()
+        rakute_room_url = str(item_row[1].value).strip()
+        rakuten_affiliate_url = str(item_row[2].value).strip()
         post_message = item_row[3].value
 
-        if "books.rakuten.co.jp" in item_url:
+        if "books.rakuten.co.jp" in rakuten_product_url:
             # 楽天ブックスの場合
             print('=====楽天ブックススクレイピング start=====')
             rakute_books_scraper = BeautifulSoupScrayping(
-                URL=item_url,
+                URL=rakuten_product_url,
                 target_css_selector="input[id='units']"
             )
             sold_out = rakute_books_scraper.is_sold_out()
             print(sold_out)
             print('=====楽天ブックススクレイピング end=====')
 
-        if "item.rakuten.co.jp" in item_url:
+        if "item.rakuten.co.jp" in rakuten_product_url:
             # 楽天市場の場合
             print('=====楽天市場スクレイピング start=====')
             rakute_ichiba_scraper = BeautifulSoupScrayping(
-                URL=item_url,
+                URL=rakuten_product_url,
                 target_css_selector="input[class='rItemUnits']"
             )
             sold_out = rakute_ichiba_scraper.is_sold_out()
@@ -179,15 +167,9 @@ def lambda_handler(event, context, test_mode=False):
 
         if sold_out is False:
             print("=====在庫あり=====")
-            rand_str = GetRandomStr(2)
 
             # twitterに投稿する内容を作成
-            msg = '{rand_str}\r\n{post_message}\r\n{rakuten_affiliate_url}\r\n{rakute_room_url}'.format(
-                rakute_room_url=rakute_room_url,
-                rand_str=rand_str,
-                rakuten_affiliate_url=rakuten_affiliate_url,
-                post_message=post_message
-            )
+            msg = f'{get_current_date()}\r\n{post_message}\r\n{rakuten_affiliate_url}\r\n{rakute_room_url}'
 
             print(f"tweet可能？：{tweetable(item_row[0].value)}")
             if tweetable(item_row[0].value):
@@ -195,6 +177,9 @@ def lambda_handler(event, context, test_mode=False):
                 tstr = tdatetime.strftime('%Y/%m/%d %H:%M:%S')
                 item_row[4].value = tstr
                 item_row[5].value = "不可"
+
+                # DBをアップデート
+                update_set_products_table(rakuten_product_url, latest_notification_date=tdatetime)
 
                 # ツイート実行
                 auth = tweepy.OAuthHandler(API_KEY, API_SECRET_KEY)
