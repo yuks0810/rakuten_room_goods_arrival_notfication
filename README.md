@@ -27,7 +27,7 @@ $ python lambda_function.py
 ```
 
 ## 実行コマンド
-<img src="https://img.shields.io/badge/kakakakakku-must--check-life-232f3e.svg?style=for-the-badge">
+<img src="https://img.shields.io/badge/kakakakakku-MustCheck-life-232f3e.svg?style=for-the-badge">
 
 
 
