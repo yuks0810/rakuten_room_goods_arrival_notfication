@@ -1,4 +1,5 @@
 # rakuten_room_goods_arrival_notfication
+https://img.shields.io/badge/ver.-v2.1.0-ff7964.svg?style=for-the-badge
 the app which notifies goods arrivals listed on rakuten pages.
 
 ## 環境構築
@@ -22,6 +23,9 @@ $ python lambda_function.py
 ```
 
 ## 実行コマンド
+
+https://img.shields.io/badge/kakakakakku-must--check-life-232f3e.svg?style=for-the-badge
+
 
 ## PR作成前
 静的解析を実行する
