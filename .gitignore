@@ -154,3 +154,4 @@ get-pip.py
 .devcontainer/
 
 db/*
+!db/README.md
