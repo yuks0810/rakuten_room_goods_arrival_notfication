@@ -1,4 +1,5 @@
 <img src="https://img.shields.io/badge/-Python-F9DC3E.svg?logo=python&style=flat">
+<img src="https://img.shields.io/badge/-Amazon%20AWS-232F3E.svg?logo=amazon-aws&style=flat">
 
 # rakuten_room_goods_arrival_notfication
 <img src="https://img.shields.io/badge/ver.-v2.1.0-ff7964.svg?style=for-the-badge">
