@@ -1,3 +1,5 @@
+<img src="https://img.shields.io/badge/-Python-F9DC3E.svg?logo=python&style=flat">
+
 # rakuten_room_goods_arrival_notfication
 https://img.shields.io/badge/ver.-v2.1.0-ff7964.svg?style=for-the-badge
 the app which notifies goods arrivals listed on rakuten pages.
