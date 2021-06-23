@@ -3,6 +3,9 @@
 # rakuten_room_goods_arrival_notfication
 <img src="https://img.shields.io/badge/ver.-v2.1.0-ff7964.svg?style=for-the-badge">
 
+### EC2
+https://ap-northeast-1.console.aws.amazon.com/ec2/v2/home?region=ap-northeast-1#InstanceDetails:instanceId=i-0be5be70f0ca22e21
+
 the app which notifies goods arrivals listed on rakuten pages.
 
 ## 環境構築
