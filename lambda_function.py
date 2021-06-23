@@ -9,6 +9,7 @@ import datetime
 # import settings  # dotenv
 from src.GspreadControll import cells_to_arry
 from src.BeautifulSoup.beautifulSoupPareint import BeautifulSoupScrayping
+from logs import logger
 
 from mysql.query import (
     create_db_connection,
@@ -17,12 +18,12 @@ from mysql.query import (
     update_set_products_table,
     select_from_products_table
 )
-
-
 # ServiceAccountCredentials：Googleの各サービスへアクセスできるservice変数を生成します。
 from oauth2client.service_account import ServiceAccountCredentials
-
 import yaml
+
+logger = logger.setup_logger(__name__, logfile="./logs/access.log")
+
 with open('src/SeleniumDir/config.yml', 'r') as yml:
     config = yaml.safe_load(yml)
 
@@ -81,7 +82,7 @@ def tweetable(rakuten_product_url):
     rakuten_product_url = rakuten_product_url.strip()
     # DBから該当の楽天URLを持つデータを取得する
     row = select_from_products_table(rakuten_product_url)
-    print(row)
+    logger.info(row)
     # 現在時刻を取得
     datetime_now = get_current_date()
 
@@ -106,21 +107,21 @@ def lambda_handler(event, context, test_mode=False):
     メイン関数
     event, contextは "AWS Lambda" で動かすのに必要な引数
     '''
-    print('event: {}'.format(event))
-    print('context: {}'.format(context))
+    logger.info('event: {}'.format(event))
+    logger.info('context: {}'.format(context))
 
     # DBに接続
     global conn, cur
     conn, cur = create_db_connection()
 
     # google spread sheetに接続
-    print('==========spread sheet接続 start==========')
+    logger.info('==========spread sheet接続 start==========')
     worksheet, api_key_worksheet = access_to_google_spread()
     # 商品の一覧の範囲を取得
     item_index = worksheet.range('A2:G10')
     # ２次元配列にした方が操作しやすいため、item_indexを２次元配列に変換
     item_index2d = cells_to_arry.cellsto2darray(item_index, 7)
-    print('==========spread sheet接続 end==========')
+    logger.info('==========spread sheet接続 end==========')
 
     # テスト用（.envから読み取っている）
     # API_KEY = settings.API_KEY
@@ -128,12 +129,12 @@ def lambda_handler(event, context, test_mode=False):
     # ACCESS_TOKEN = settings.ACCESS_TOKEN
     # ACCESS_TOKEN_SECRET = settings.ACCESS_TOKEN_SECRET
 
-    print('==========twitter情報取得==========')
+    logger.info('==========twitter情報取得==========')
     API_KEY = str(api_key_worksheet.acell('B1').value.strip())
     API_SECRET_KEY = str(api_key_worksheet.acell('B2').value.strip())
     ACCESS_TOKEN = str(api_key_worksheet.acell('B3').value.strip())
     ACCESS_TOKEN_SECRET = str(api_key_worksheet.acell('B4').value.strip())
-    print('==========twitter情報取得 end==========')
+    logger.info('==========twitter情報取得 end==========')
 
     for item_row in item_index2d:
         if item_row[0].value == "" or tweetable(item_row[0].value) is False:
@@ -146,32 +147,32 @@ def lambda_handler(event, context, test_mode=False):
 
         if "books.rakuten.co.jp" in rakuten_product_url:
             # 楽天ブックスの場合
-            print('=====楽天ブックススクレイピング start=====')
+            logger.info('=====楽天ブックススクレイピング start=====')
             rakute_books_scraper = BeautifulSoupScrayping(
                 URL=rakuten_product_url,
                 target_css_selector="input[id='units']"
             )
             sold_out = rakute_books_scraper.is_sold_out()
-            print(sold_out)
-            print('=====楽天ブックススクレイピング end=====')
+            logger.info(sold_out)
+            logger.info('=====楽天ブックススクレイピング end=====')
 
         if "item.rakuten.co.jp" in rakuten_product_url:
             # 楽天市場の場合
-            print('=====楽天市場スクレイピング start=====')
+            logger.info('=====楽天市場スクレイピング start=====')
             rakute_ichiba_scraper = BeautifulSoupScrayping(
                 URL=rakuten_product_url,
                 target_css_selector="input[class='rItemUnits']"
             )
             sold_out = rakute_ichiba_scraper.is_sold_out()
-            print('=====楽天市場スクレイピング end=====')
+            logger.info('=====楽天市場スクレイピング end=====')
 
         if sold_out is False:
-            print("=====在庫あり=====")
+            logger.info("=====在庫あり=====")
 
             # twitterに投稿する内容を作成
             msg = f'{get_current_date()}\r\n{post_message}\r\n{rakuten_affiliate_url}\r\n{rakute_room_url}'
 
-            print(f"tweet可能？：{tweetable(item_row[0].value)}")
+            logger.info(f"tweet可能？：{tweetable(item_row[0].value)}")
             if tweetable(item_row[0].value):
                 tdatetime = get_current_date()
                 tstr = tdatetime.strftime('%Y/%m/%d %H:%M:%S')
@@ -186,7 +187,7 @@ def lambda_handler(event, context, test_mode=False):
                 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
                 api = tweepy.API(auth)
                 api.update_status(msg)
-                print('=====SpreadSheetに書き込みを行いました=====')
+                logger.info('=====SpreadSheetに書き込みを行いました=====')
 
         if sold_out is True:
             msg = '{rakute_room_url}'.format(
@@ -214,4 +215,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # ローカル環境で実行するときはtest_mode=Trueにする
-    print(lambda_handler(event=None, context=None, test_mode=args.test_mode))
+    logger.info(lambda_handler(event=None, context=None, test_mode=args.test_mode))

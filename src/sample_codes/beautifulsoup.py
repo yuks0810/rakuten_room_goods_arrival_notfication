@@ -1,5 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
+
+logger = logger.setup_logger(__name__)
  
 URL = 'https://item.rakuten.co.jp/kakko/c4701938/'
 headers = {"User-Agent": "hoge"}
