@@ -12,7 +12,7 @@ def create_db_connection():
     conn = MySQLdb.connect(
         user="root",
         # passwd=os.environ['MYSQL_ROOT_PASSWORD'],
-        passwd="root"
+        passwd="root",
         host="rakuten_db_mysql",
         db="rakuten_app_db"
     )
