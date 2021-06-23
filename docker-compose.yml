@@ -6,13 +6,8 @@ services:
     restart: always
     container_name: 'rakuten'
     working_dir: '/webapp'
-    command: bash -C "pip install pipenv && pipenv lock -r > requirements.txt && pip install -r requirements.txt $$ pip install mysqlclient"
+    command: bash -C "pip install pipenv && pipenv lock -r > requirements.txt && pip install -r requirements.txt"
     tty: true
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_HOST: ${MYSQL_HOST}
     volumes:
       - .:/webapp
 
@@ -23,17 +18,15 @@ services:
     env_file:
       - .env
     volumes:
-      - ./mysql/db:/docker-entrypoint-initdb.d
-      # 初期データを投入するSQLが格納されているdir
-      - ./db/mysql_init:/docker-entrypoint-initdb.d
+      # - ./mysql/db:/docker-entrypoint-initdb.d
+      # # 初期データを投入するSQLが格納されているdir
+      # - ./db/mysql_init:/docker-entrypoint-initdb.d
       # 永続化するときにマウントするdir
       - ./db/mysql_data:/var/lib/mysql
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_DATABASE: 'rakuten_app_db'
+      MYSQL_USER: 'rakuten01'
       TZ: "Asia/Tokyo"
       BIND-ADDRESS: 0.0.0.0
     expose:

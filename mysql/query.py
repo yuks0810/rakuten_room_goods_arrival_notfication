@@ -10,10 +10,11 @@ def create_db_connection():
     global cur
 
     conn = MySQLdb.connect(
-        user=os.environ['MYSQL_USER'],
-        passwd=os.environ['MYSQL_ROOT_PASSWORD'],
-        host=os.environ['MYSQL_HOST'],
-        db=os.environ['MYSQL_DATABASE']
+        user="root",
+        # passwd=os.environ['MYSQL_ROOT_PASSWORD'],
+        passwd="root"
+        host="rakuten_db_mysql",
+        db="rakuten_app_db"
     )
     cur = conn.cursor()
     return conn, cur
