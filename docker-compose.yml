@@ -6,8 +6,13 @@ services:
     restart: always
     container_name: 'rakuten'
     working_dir: '/webapp'
-    command: bash -C "pip install pipenv && pipenv lock -r > requirements.txt && pip install -r requirements.txt"
+    command: bash -C "pip install pipenv && pipenv lock -r > requirements.txt && pip install -r requirements.txt $$ pip install mysqlclient"
     tty: true
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_HOST: ${MYSQL_HOST}
     volumes:
       - .:/webapp
 
@@ -25,7 +30,10 @@ services:
       - ./db/mysql_data:/var/lib/mysql
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
-      MYSQL_DATABASE: 'rakute_app_db'
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_HOST: ${MYSQL_HOST}
       TZ: "Asia/Tokyo"
       BIND-ADDRESS: 0.0.0.0
     expose:

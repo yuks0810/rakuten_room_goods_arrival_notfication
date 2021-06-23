@@ -110,7 +110,7 @@ CONTAINER ID   IMAGE                                            COMMAND         
 
 メインのホストコンテナからターミナルで接続するときのコマンド
 ```
-mysql -u root -p -h rakuten_db_mysql -P 3306 --protocol=tcp -D rakute_app_db
+mysql -u root -p -h rakuten_db_mysql -P 3306 --protocol=tcp -D rakuten_app_db
 ```
 
 パスワードは `.env` ファイルに記載されている。
@@ -118,11 +118,12 @@ mysql -u root -p -h rakuten_db_mysql -P 3306 --protocol=tcp -D rakute_app_db
 ### 接続情報
 
 ```
-hostname: rakuten_db_mysql
+hostname: .envに記載
 password: .envに記載
-user: root
-db: rakute_app_db
+user:     .envに記載
+db:       .envに記載
 ```
+つまり、.envをみましょう
 
 ## 過去ログ
 

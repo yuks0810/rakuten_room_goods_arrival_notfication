@@ -47,4 +47,4 @@ virtualenv==20.4.6
 virtualenv-clone==0.5.4
 webdriver-manager==3.4.1
 zipp==3.4.1
-mysqlclient==*
+# mysqlclient==*
