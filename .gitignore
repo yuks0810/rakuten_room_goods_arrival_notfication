@@ -155,3 +155,5 @@ get-pip.py
 
 db/*
 !db/README.md
+
+logs/*
