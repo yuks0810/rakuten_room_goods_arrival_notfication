@@ -4,6 +4,7 @@ from os import curdir
 import gspread
 import tweepy
 from datetime import datetime as dt, timedelta, timezone
+import pytz
 import datetime
 # import settings  # dotenv
 from src.GspreadControll import cells_to_arry
@@ -54,7 +55,7 @@ def access_to_google_spread():
 
 def get_current_date():
     # 日本時間で現在時間を取得する
-    timenow = dt.now(JST)
+    timenow = dt.now(pytz.timezone('Asia/Tokyo'))
     current_time_in_datetime = datetime.datetime(
         year=timenow.year,
         month=timenow.month,
@@ -213,8 +214,7 @@ if __name__ == '__main__':
     parser.add_argument('--test_mode', action='store_true')
     args = parser.parse_args()
 
-    JST = timezone(timedelta(hours=+9), 'JST')
-    timenow = dt.now(JST)
+    timenow = get_current_date()
     am_6 = datetime.datetime(
         year=timenow.year,
         month=timenow.month,
@@ -234,8 +234,7 @@ if __name__ == '__main__':
     )
 
     # ローカル環境で実行するときはtest_mode=Trueにする
-    current_time = get_current_date()
-    while am_6 <= current_time <= am_24:
+    while am_6 <= timenow <= am_24:
         time.sleep(1)
         print("sleep 1 sec")
         logger.info(lambda_handler(event=None, context=None, test_mode=args.test_mode))
