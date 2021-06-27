@@ -1,8 +1,7 @@
+import time
 import argparse
 from os import curdir
 import gspread
-import random
-import string
 import tweepy
 from datetime import datetime as dt, timedelta, timezone
 import datetime
@@ -214,5 +213,29 @@ if __name__ == '__main__':
     parser.add_argument('--test_mode', action='store_true')
     args = parser.parse_args()
 
+    JST = timezone(timedelta(hours=+9), 'JST')
+    timenow = dt.now(JST)
+    am_6 = datetime.datetime(
+        year=timenow.year,
+        month=timenow.month,
+        day=timenow.day,
+        hour=6,
+        minute=0,
+        second=0
+    )
+
+    am_24 = datetime.datetime(
+        year=timenow.year,
+        month=timenow.month,
+        day=timenow.day+1,
+        hour=0,
+        minute=0,
+        second=0
+    )
+
     # ローカル環境で実行するときはtest_mode=Trueにする
-    logger.info(lambda_handler(event=None, context=None, test_mode=args.test_mode))
+    current_time = get_current_date()
+    while am_6 <= current_time <= am_24:
+        time.sleep(1)
+        print("sleep 1 sec")
+        logger.info(lambda_handler(event=None, context=None, test_mode=args.test_mode))
