@@ -15,7 +15,8 @@ class SeleniumParent:
         self.driver.get(item_url)
         self.driver.implicitly_wait(10)
         self.driver.set_window_size('1200', '1000')
-        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        self.driver.execute_script(
+            "window.scrollTo(0, document.body.scrollHeight);")
 
     def is_sold_out(self) -> bool:
         '''

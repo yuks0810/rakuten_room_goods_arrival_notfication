@@ -23,6 +23,7 @@ chromedriver-binary = "*"
 pyyaml = "*"
 importlib-metadata = "==2.1.1"
 webdriver-manager = "*"
+mysqlclient = "*"
 
 [dev-packages]
 pep8 = "*"

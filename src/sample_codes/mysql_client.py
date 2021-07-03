@@ -1,6 +1,7 @@
 import MySQLdb
 import datetime
 
+
 def insert_into_products_table(cur, latest_notification_date, rakuten_product_url="", rakuten_room_url="", affiliate_url=""):
     sql = "INSERT INTO `rakuten_app_db`.`products` \
                 (rakuten_product_url, rakuten_room_url, affiliate_url, latest_notification_date) \
@@ -12,6 +13,7 @@ def insert_into_products_table(cur, latest_notification_date, rakuten_product_ur
     )
     cur.execute(sql)
     conn.commit()
+
 
 if __name__ == "__main__":
     # 接続する

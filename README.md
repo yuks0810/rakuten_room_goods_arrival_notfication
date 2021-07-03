@@ -1,26 +1,26 @@
 <img src="https://img.shields.io/badge/-Python-F9DC3E.svg?logo=python&style=flat"> <img src="https://img.shields.io/badge/-Amazon%20AWS-232F3E.svg?logo=amazon-aws&style=flat"> <img src="https://img.shields.io/badge/-Docker-1488C6.svg?logo=docker&style=flat-square">
 
-# rakuten_room_goods_arrival_notfication
+# 1. rakuten_room_goods_arrival_notfication
 <img src="https://img.shields.io/badge/ver.-v2.1.0-ff7964.svg?style=for-the-badge">
 
-### EC2
+### 1.0.1. EC2
 https://ap-northeast-1.console.aws.amazon.com/ec2/v2/home?region=ap-northeast-1#InstanceDetails:instanceId=i-0be5be70f0ca22e21
 
 the app which notifies goods arrivals listed on rakuten pages.
 
-## 環境構築
+## 1.1. 環境構築
 下記コマンド実行で pipenv installを行ってpython環境を構築する
 ```
 $ docker-compose up -d --build
 ```
 
-### ローカルで作業するとき（log見れない）
+### 1.1.1. ローカルで作業するとき（log見れない）
 スクレイピングを実行
 ```
 $ docker-compose run rakuten python lambda_function.py
 ```
 
-#### terminalに表示されるlogを見たいとき
+#### 1.1.1.1. terminalに表示されるlogを見たいとき
 ```
 $ docker-compose exec rakuten bash
 
@@ -28,10 +28,10 @@ $ docker-compose exec rakuten bash
 $ python lambda_function.py
 ```
 
-## 実行コマンド
+## 1.2. 実行コマンド
 <img src="https://img.shields.io/badge/MUST%20CHECK-Execution%20Commnands-3DBB3D.svg?logo=&style=flat-square">
 
-## PR作成前
+## 1.3. PR作成前
 静的解析を実行する
 
 <file_name>の箇所に静的解析を行いたいfileの名前(.py)を入力する
@@ -64,19 +64,19 @@ incorrect number of argumentsroot@10d680bf8aa9:/webapp# autopep8 --global-config
 --->  1 issue(s) to fix {'E501': {213}}
 ```
 
-## EC2での動かし方
-### 対象のインスタンス
+## 1.4. EC2での動かし方
+### 1.4.1. 対象のインスタンス
 Name: rakute_scrayping
 インスタンスID: i-0be5be70f0ca22e21
 このインスタンスが停止している場合は、インスタンスを起動する。
-### EC2にssh接続する
+### 1.4.2. EC2にssh接続する
 
 <バブリックIP>の部分はawsの対象のEC2をみて確認
 ```
 # -iのあとのpath指定はrakuten_scrayping_sub.pemがある場所を指定する
 $ ssh -i ~/.ssh/rakuten_scrayping_sub.pem ec2-user@<バブリックIP>
 ```
-### sshでEC2に接続したあと
+### 1.4.3. sshでEC2に接続したあと
 
 下記のコマンドを実行して、`rakuten_room_goods_arrival_notfication_rakuten`が出てくればアプリが起動しているということ
 ```
@@ -109,7 +109,7 @@ CONTAINER ID   IMAGE                                            COMMAND         
 8e78758594a6   rakuten_room_goods_arrival_notfication_rakuten   "/bin/sh -c 'while :…"   26 hours ago   Up 47 seconds             rakuten
 ```
 
-## DB
+## 1.5. DB
 
 メインのホストコンテナからターミナルで接続するときのコマンド
 ```
@@ -118,7 +118,7 @@ mysql -u root -p -h rakuten_db_mysql -P 3306 --protocol=tcp -D rakuten_app_db
 
 パスワードは `.env` ファイルに記載されている。
 
-### 接続情報
+### 1.5.1. 接続情報
 
 ```
 hostname: .envに記載
@@ -128,15 +128,15 @@ db:       .envに記載
 ```
 つまり、.envをみましょう
 
-## 過去ログ
+## 1.6. 過去ログ
 
-### s3に上げるためのコマンド
+### 1.6.1. s3に上げるためのコマンド
 下記コマンド実行で upload.zipを作成する
 ```
 $ docker-compose exec rakuten sh make_upload.sh
 ```
 
-### docker環境破壊
+### 1.6.2. docker環境破壊
 作業終了後は下記コマンド実行
 ```
 $ docker-compose down --rmi all --volumes --remove-orphans
@@ -144,4 +144,12 @@ $ docker-compose down --rmi all --volumes --remove-orphans
 OR
 ```
 $ docker system prune
+```
+
+## 1.7. LOGの保存場所
+
+`logs/access.log`
+
+```
+tail -f logs/access.log
 ```

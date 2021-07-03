@@ -26,7 +26,7 @@ PROXY = [
     '43.249.224.172:83',
     '160.19.240.58:8080',
     '43.225.66.184:80'
-    ]
+]
 # PROXY_AUTH = '{userid}:{password}' # IDとパスワード
 
 # ヘッドレス起動のためのオプションを用意
@@ -41,7 +41,8 @@ options.add_argument("--proxy-bypass-list=*")
 options.add_argument("--start-maximized")
 options.add_argument('--disable-dev-shm-usage')
 options.add_argument('--allow-running-insecure-content')
-options.add_argument(f'--proxy-server=http://{PROXY[random.randint(0, len(PROXY)-1)]}')
+options.add_argument(
+    f'--proxy-server=http://{PROXY[random.randint(0, len(PROXY)-1)]}')
 
 # Chrome Driver
 driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
@@ -55,7 +56,6 @@ try:
     title = wait.until(EC.element_to_be_clickable((By.TAG_NAME, "title")))
     print(f'title name: {title}')
 
-
     page_width = driver.execute_script('return document.body.scrollWidth')
     page_height = driver.execute_script('return document.body.scrollHeight')
     driver.set_window_size(page_width, page_height)
@@ -63,9 +63,11 @@ try:
     # item_units_input_elm = driver.find_element(By.CSS_SELECTOR, "input[class='rItemUnits']")
     # addd_to_shoppin_cart_button_elm = driver.find_element(By.XPATH, '//*[@id="normal_basket_10006065"]/tbody/tr[5]/td/span[2]/span/span[1]/button/span/span')
 
-    item_units_input_elm = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "rItemUnits")))
+    item_units_input_elm = wait.until(
+        EC.element_to_be_clickable((By.CLASS_NAME, "rItemUnits")))
     # add_to_shoppin_cart_button_elm = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, 'button[class="cart-button add-cart'))).find_element_by_css_selector('span[class="normal"]').find_element_by_tag_name('span')
-    add_to_shoppin_cart_button_elm = wait.until(EC.element_to_be_clickable((By.XPATH, '//*[@id="normal_basket_10006065"]/tbody/tr[5]/td/span[2]/span/span[1]/button/span/span')))
+    add_to_shoppin_cart_button_elm = wait.until(EC.element_to_be_clickable(
+        (By.XPATH, '//*[@id="normal_basket_10006065"]/tbody/tr[5]/td/span[2]/span/span[1]/button/span/span')))
 
     print("===== done finding item units input & shopping cart button =====")
 

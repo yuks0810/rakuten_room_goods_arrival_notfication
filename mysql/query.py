@@ -78,7 +78,7 @@ def create_products_tabl(table_name):
 
     except Exception as e:
         print(e)
-    
+
     close_db_connections()
 
 
