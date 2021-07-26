@@ -266,9 +266,9 @@ if __name__ == '__main__':
     print(timenow)
 
     # ローカル環境で実行するときはtest_mode=Trueにする
-    # while am_6 <= timenow <= am_24:
-    #     time.sleep(1)
-    #     print("sleep 1 sec")
-    #     scraping_processor = ScraypingProcessor()
-    #     scraping_processor.main()
-    #     del scraping_processor
+    while am_6 <= timenow <= am_24:
+        time.sleep(1)
+        print("sleep 1 sec")
+        scraping_processor = ScraypingProcessor()
+        scraping_processor.main()
+        del scraping_processor
