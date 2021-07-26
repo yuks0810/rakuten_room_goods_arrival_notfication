@@ -43,7 +43,8 @@ gc = gspread.authorize(credentials)
 
 def get_current_date():
     # 日本時間で現在時間を取得する
-    timenow = dt.now()
+    JST = timezone(timedelta(hours=+9), 'JST')
+    timenow = dt.now(JST)
     current_time_in_datetime = datetime.datetime(
         year=timenow.year,
         month=timenow.month,
@@ -240,7 +241,8 @@ class ScraypingProcessor:
 
 
 if __name__ == '__main__':
-    timenow = get_current_date()
+    timenow = get_current_date() + datetime.timedelta(days=-4, hours=19, minutes=50)
+    # timenow = get_current_date()
     am_6 = datetime.datetime(
         year=timenow.year,
         month=timenow.month,
@@ -261,11 +263,12 @@ if __name__ == '__main__':
 
     print(am_6)
     print(am_24)
+    print(timenow)
 
     # ローカル環境で実行するときはtest_mode=Trueにする
-    while am_6 <= timenow <= am_24:
-        time.sleep(1)
-        print("sleep 1 sec")
-        scraping_processor = ScraypingProcessor()
-        scraping_processor.main()
-        del scraping_processor
+    # while am_6 <= timenow <= am_24:
+    #     time.sleep(1)
+    #     print("sleep 1 sec")
+    #     scraping_processor = ScraypingProcessor()
+    #     scraping_processor.main()
+    #     del scraping_processor

@@ -13,6 +13,12 @@ the app which notifies goods arrivals listed on rakuten pages.
 ```
 $ docker-compose up -d --build
 ```
+#### EC2での実行
+
+EC2上ではpathが通っていないので、下記で実行する。
+```
+$ sudo /usr/local/bin/docker-compose up -d --build
+```
 
 ### 1.1.1. ローカルで作業するとき（log見れない）
 スクレイピングを実行
