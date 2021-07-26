@@ -43,7 +43,7 @@ gc = gspread.authorize(credentials)
 
 def get_current_date():
     # 日本時間で現在時間を取得する
-    timenow = dt.now(pytz.timezone('Asia/Tokyo'))
+    timenow = dt.now()
     current_time_in_datetime = datetime.datetime(
         year=timenow.year,
         month=timenow.month,
@@ -258,6 +258,9 @@ if __name__ == '__main__':
         minute=0,
         second=0
     )
+
+    print(am_6)
+    print(am_24)
 
     # ローカル環境で実行するときはtest_mode=Trueにする
     while am_6 <= timenow <= am_24:
