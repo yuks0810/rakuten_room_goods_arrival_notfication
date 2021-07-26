@@ -241,7 +241,7 @@ class ScraypingProcessor:
 
 
 if __name__ == '__main__':
-    timenow = get_current_date() + datetime.timedelta(days=-4, hours=19, minutes=50)
+    timenow = get_current_date() + datetime.timedelta(days=-4, hours=34, minutes=48)
     # timenow = get_current_date()
     am_6 = datetime.datetime(
         year=timenow.year,
