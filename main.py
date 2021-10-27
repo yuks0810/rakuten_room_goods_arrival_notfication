@@ -63,11 +63,9 @@ class ScraypingProcessor:
         global conn, cur
         conn, cur = create_db_connection()
 
-
     def __del__(self):
         # インスタンスを削除するときにDBセッションを閉じる
         close_db_connections()
-
 
     def access_to_google_spread(self):
         '''
@@ -79,7 +77,6 @@ class ScraypingProcessor:
         api_key_worksheet = workbook.worksheet('API_KEYS')
 
         return worksheet, api_key_worksheet
-
 
     def tweetable(self, rakuten_product_url):
         '''
@@ -115,7 +112,6 @@ class ScraypingProcessor:
                 # 30分経過していなかったら、Falseを返す。（Tweetできない）
                 return False
 
-
     def connect_to_google_spread_sheet(self):
         # google spread sheetに接続
         logger.info('==========spread sheet接続 start==========')
@@ -128,7 +124,6 @@ class ScraypingProcessor:
 
         return worksheet, api_key_worksheet, item_index2d
 
-
     def get_twitter_account_keys(self, api_key_worksheet):
         logger.info('==========twitter情報取得==========')
         API_KEY = str(api_key_worksheet.acell('B1').value.strip())
@@ -138,7 +133,6 @@ class ScraypingProcessor:
         logger.info('==========twitter情報取得 end==========')
 
         return API_KEY, API_SECRET_KEY, ACCESS_TOKEN, ACCESS_TOKEN_SECRET
-
 
     def scrayping_process(self, rakuten_product_url, rakute_room_url, rakuten_affiliate_url, post_message, item_row):
         """
@@ -198,7 +192,6 @@ class ScraypingProcessor:
                 )
                 item_row[5].value = "可能"
 
-
     def main(self):
         '''
         メイン関数
@@ -255,7 +248,7 @@ if __name__ == '__main__':
     am_24 = datetime.datetime(
         year=timenow.year,
         month=timenow.month,
-        day=timenow.day+1,
+        day=timenow.day + 1,
         hour=0,
         minute=0,
         second=0
