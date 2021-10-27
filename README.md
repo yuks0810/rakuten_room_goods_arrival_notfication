@@ -13,7 +13,7 @@ the app which notifies goods arrivals listed on rakuten pages.
 ```
 $ docker-compose up -d --build
 ```
-#### EC2での実行
+#### 1.1.0.1. EC2での実行
 
 EC2上ではpathが通っていないので、下記で実行する。
 ```
@@ -63,7 +63,7 @@ lambda_function.py:258:80: E501 line too long (88 > 79 characters)
 $ autopep8 --global-config ./setup.cfg -ivr
 
 # このような修正コードが出る
-incorrect number of argumentsroot@10d680bf8aa9:/webapp# autopep8 --global-config ./setup.cfg -ivr lambda_function.py 
+incorrect number of argumentsroot@10d680bf8aa9:/webapp# autopep8 --global-config ./setup.cfg -ivr main.py 
 [file:lambda_function.py]
 --->  Applying global fix for E265
 --->  3 issue(s) to fix {'E501': {258, 213}, 'W291': {255}}
